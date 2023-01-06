@@ -1,7 +1,32 @@
-mlops-finalProject
+Project Description 
 ==============================
 
-Final project of DTU's course mlops
+
+
+
+## Overall goal of the project  
+
+We want to familiarize ourselves with industry standards machine learning software delivery pipeline by deploying a simple Traffic Sign recognition model. To do so we expect to rely on the tools reviewed in the course to carry out the different stages of a project deployment: Design, Development, and Operations. Keeping the focus on organization, reproducibility, efficient version control, debugging, and cloud integrations.   
+
+## What framework are you going to use (PyTorch Image Models, Transformer, Pytorch-Geometrics)
+
+PyTorch Image Model (TIMM)
+
+## How do you intend to include the framework into your project   
+
+The model selected can use with trained or without weights. The idea is to test the weighted version to test the performance and maybe use the feature extraction features of the framework to try to improve the accuracy.
+
+## What data are you going to run on (initially, may change)  
+
+[German Traffic Sign Recognition Benchmark GTSRB.](https://sid.erda.dk/public/archives/daaeac0d7ce1152aea9b61d9f1e19370/published-archive.html)  
+The German Traffic Sign Recognition Benchmark (GTSRB) is a multi-class image classification benchmark in the domain of advanced driver assistance systems and autonomous driving. It consists of 50000 images distributed among 43 classes.
+
+What deep learning models do you expect to use MobileNetV3 is a convolutional neural network (CNN) architecture primarily designed for efficient and accurate image recognition on mobile devices. It uses depthwise separable convolutions, inverted residuals, linear bottlenecks, and mobile blocks to reduce the computational complexity of the network and improve efficiency.
+
+
+
+
+------------
 
 Project Organization
 ------------
