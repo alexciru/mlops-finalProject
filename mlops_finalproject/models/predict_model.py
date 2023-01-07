@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 from torch.utils.data import DataLoader, TensorDataset
 #from mlops_finalproject.models import model
 import torch
@@ -95,3 +96,6 @@ def get_data(path: str) -> list:
 #     load_dotenv(find_dotenv())
 
 #     main()
+=======
+import torch
+>>>>>>> 8218a7e (files for dockerization)
