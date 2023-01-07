@@ -20,4 +20,4 @@ RUN pip install torch torchvision torchaudio --extra-index-url https://download.
 # and finally our own module
 # RUN pip install -e .
 
-ENTRYPOINT ["python", "-u", "mlops_finalProject/models/train_model.py"]
+ENTRYPOINT ["python", "-u", "mlops_finalproject/models/train_model.py"]
