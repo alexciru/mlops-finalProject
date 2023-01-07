@@ -1,0 +1,77 @@
+{
+    "os": "Linux-5.15.0-58-generic-x86_64-with-glibc2.35",
+    "python": "3.10.6",
+    "heartbeatAt": "2023-01-16T09:12:13.741045",
+    "startedAt": "2023-01-16T09:12:13.064227",
+    "docker": null,
+    "cuda": null,
+    "args": [],
+    "state": "running",
+    "program": "/home/javi/Desktop/DTU/courses/2_term/mlops-finalProject/mlops_finalproject/models/train_model.py",
+    "codePath": "mlops_finalproject/models/train_model.py",
+    "git": {
+        "remote": "git@github.com:alexciru/mlops-finalProject.git",
+        "commit": "8f1c1aafa2ede8931676cca03ddf023382a83a4d"
+    },
+    "email": "vatojavier@gmail.com",
+    "root": "/home/javi/Desktop/DTU/courses/2_term/mlops-finalProject",
+    "host": "javi-HP",
+    "username": "javi",
+    "executable": "/home/javi/.virtualenvs/mlops-project/bin/python",
+    "cpu_count": 4,
+    "cpu_count_logical": 8,
+    "cpu_freq": {
+        "current": 2580.9293749999997,
+        "min": 400.0,
+        "max": 4700.0
+    },
+    "cpu_freq_per_core": [
+        {
+            "current": 2800.0,
+            "min": 400.0,
+            "max": 4700.0
+        },
+        {
+            "current": 1047.435,
+            "min": 400.0,
+            "max": 4700.0
+        },
+        {
+            "current": 2800.0,
+            "min": 400.0,
+            "max": 4700.0
+        },
+        {
+            "current": 2800.0,
+            "min": 400.0,
+            "max": 4700.0
+        },
+        {
+            "current": 2800.0,
+            "min": 400.0,
+            "max": 4700.0
+        },
+        {
+            "current": 2800.0,
+            "min": 400.0,
+            "max": 4700.0
+        },
+        {
+            "current": 2800.0,
+            "min": 400.0,
+            "max": 4700.0
+        },
+        {
+            "current": 2800.0,
+            "min": 400.0,
+            "max": 4700.0
+        }
+    ],
+    "disk": {
+        "total": 233.98657608032227,
+        "used": 126.90749740600586
+    },
+    "memory": {
+        "total": 11.34130859375
+    }
+}
