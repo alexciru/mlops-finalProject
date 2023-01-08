@@ -57,7 +57,7 @@ create_environment:
 
 ## Make Dataset
 data: requirements
-	$(PYTHON_INTERPRETER) mlops_finalproject/data/make_dataset.py
+	$(PYTHON_INTERPRETER) mlops_finalproject/data/make_dataset.py  data/raw/German/Train  data/processed/German/Train
 
 #################################################################################
 # Self Documenting Commands                                                     #
