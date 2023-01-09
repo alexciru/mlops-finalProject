@@ -5,7 +5,6 @@ import numpy as np
 from torchvision import transforms, datasets
 import torch
 import os
-import cv2
 import pandas as pd
 from pathlib import Path
 from dotenv import find_dotenv, load_dotenv
