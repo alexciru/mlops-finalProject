@@ -21,7 +21,7 @@ The model selected can use with trained or without weights. The idea is to test 
 [German Traffic Sign Recognition Benchmark GTSRB.](https://sid.erda.dk/public/archives/daaeac0d7ce1152aea9b61d9f1e19370/published-archive.html)  
 The German Traffic Sign Recognition Benchmark (GTSRB) is a multi-class image classification benchmark in the domain of advanced driver assistance systems and autonomous driving. It consists of 50000 images distributed among 43 classes.
 
-What deep learning models do you expect to use MobileNetV3 is a convolutional neural network (CNN) architecture primarily designed for efficient and accurate image recognition on mobile devices. It uses depthwise separable convolutions, inverted residuals, linear bottlenecks, and mobile blocks to reduce the computational complexity of the network and improve efficiency.
+What deep learning models do you expect to use? We expect to use MobileNetV3, which is a convolutional neural network (CNN) architecture primarily designed for efficient and accurate image recognition on mobile devices. It uses depthwise separable convolutions, inverted residuals, linear bottlenecks, and mobile blocks to reduce the computational complexity of the network and improve efficiency.
 
 
 
