@@ -15,7 +15,8 @@ def test_load_train_data():
     # Test
     train_images = torch.load("data/processed/images.pt")
     train_labels = torch.load("data/processed/labels.pt")
-    assert len(train_images) == len(train_labels)  == 25000, "Train size have an incorrect number of entries"
+    assert len(train_images) == 39209, "Train imgs size have an incorrect number of entries"
+    assert len(train_labels) == 39209,  "Train labels size have an incorrect number of entries"
 
 
  
@@ -33,7 +34,7 @@ def test_load_data_shape():
 
     for batch, __ in trainloader:
         for img in batch:
-            assert img.shape ==  torch.Size([1, 28, 28]), "Img have a incorrect size"
+            assert img.shape ==  torch.Size([2700]), "Img have a incorrect size"
 
 
 
@@ -52,14 +53,14 @@ def test_load_data_labels():
     ) 
 
     unique = torch.unique(labels)
-    for i in range(0, 10): assert i in unique , "data not contains all the labels"
+    for i in range(0, 43): assert i in unique , "data not contains all the labels"
 
 ####################################################################################
 #                  DATA TEST
 ####################################################################################
 
 
-@pytest.mark.skipif(not os.path.exists(_PATH_DATA + "\\raw\\test.npz"), reason="Data files not found")
+@pytest.mark.skipif(not os.path.exists("data/raw/German/Test.csv"), reason="Data files not found")
 def test_load_test_data():
-    test_images, test_labels = mlops_finalproject.models.predict_model.get_data( _PATH_DATA + "\\raw\\test.npz")
-    assert len(test_images) == len(test_labels) == 5000 , "Test size have an incorrect number of entries"
+    test_images, test_labels = mlops_finalproject.models.predict_model.get_data("data/raw/German")
+    assert len(test_images) == len(test_labels) == 12630 , "Test size have an incorrect number of entries"

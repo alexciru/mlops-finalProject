@@ -21,7 +21,7 @@ def main(input_filepath: str, output_filepath:str):
     logger.info('making final data set from raw data')
 
    # Train files -  organized in folders from labels
-    transform = transforms.Compose([transforms.Resize([112, 112]), transforms.ToTensor()])
+    transform = transforms.Compose([transforms.Resize([30, 30]), transforms.ToTensor()])
     train_dataset = datasets.ImageFolder(input_filepath, transform=transform)
 
     # test files -  labels in csv
@@ -29,14 +29,12 @@ def main(input_filepath: str, output_filepath:str):
     # test_labels = test_info["ClassId"].values
     # imgs = test_info["Path"].values
 
-    # test_imgs = []
-    # for img in imgs:
-    #     path = os.path.join(input_filepath, img)
-    #     image = cv2.imread(path)
-    #     print(image.shape())
-    #     #image_fromarray = Image.fromarray(image, 'RGB') 
-    #     #resize_image = image_fromarray.resize((30, 30))
-    #     test_imgs.append(np.array(image))
+    train_imgs = []
+    train_labels = []
+    for img, label in train_dataset:
+        flatten_tensor = torch.flatten(img, start_dim=0)
+        train_imgs.append(flatten_tensor)
+        train_labels.append(label)
 
 
     # # Join all of the data
@@ -47,12 +45,13 @@ def main(input_filepath: str, output_filepath:str):
     # final_labels = []
     # final_labels = train_dataset.classes
     # final_labels.append(test_labels)
-
+    train_images = torch.stack(train_imgs)
+    train_labels = torch.Tensor(train_dataset.targets)
 
     # Store data
-    torch.save(train_dataset.imgs, f"{output_filepath}/images.pt")
-    torch.save(train_dataset.classes, f"{output_filepath}/labels.pt")
-
+    torch.save(train_images, f"{output_filepath}/images.pt")
+    torch.save(train_labels, f"{output_filepath}/labels.pt")
+    logger.info('data store successfully')
     #torch.save(final_imgs, f"{output_filepath}/images.pt")
     #torch.save(final_labels, f"{output_filepath}/labels.pt")
 
