@@ -1,74 +1,41 @@
-# Import necessary libraries
+import timm
+import urllib
+from PIL import Image
+from timm.data import resolve_data_config
+from timm.data.transforms_factory import create_transform
 import torch
-import torch.nn as nn
-import torchvision.transforms as transforms
-from torch.utils.data import DataLoader
-from torchvision.datasets import TensorDataset
-from model.py import model
-import matplotlib.pyplot as plt
 
-#Hyperparameters
-num_epochs = 20
-
-# Define the data transforms
-data_transforms = transforms.Compose([
-    transforms.Resize(256),
-    transforms.CenterCrop(224),
-    transforms.ToTensor(),
-    transforms.Normalize([0.485, 0.456, 0.406], [0.229, 0.224, 0.225])
-])
-
-# Load the dataset
-images = torch.load("data/processed/images.pt")
-labels = torch.load("data/processed/labels.pt")
-train_dataset = TensorDataset(images, labels, transform=data_transforms)
-trainloader = DataLoader(train_dataset, batch_size=64, shuffle=True) 
-
-# Define the loss function and optimizer
-criterion = nn.CrossEntropyLoss()
-optimizer = torch.optim.SGD(model.parameters(), lr=0.001, momentum=0.9)
-
-# Train the model
-losses = []
-model.train
-for epoch in range(num_epochs):
-    running_loss = 0
-    for i, (inputs, labels) in enumerate(dataloader):
-        optimizer.zero_grad()
-        outputs = model(inputs)
-        loss = criterion(outputs, labels)
-        loss.backward()
-        optimizer.step()
-        running_loss += loss.item()
-    else:
-        losses.append(running_loss/len(trainloader))
-        steps += 1
-        print(f"Training loss: {running_loss/len(trainloader)}")
+model = timm.create_model('mobilenetv3_large_100', pretrained=True)
+model.eval()
 
 
-# Use the plot function to draw a line plot
-plt.plot(steps, losses)
+config = resolve_data_config({}, model=model)
+transform = create_transform(**config)
+url, filename = ("https://github.com/pytorch/hub/raw/master/images/dog.jpg", "dog.jpg")
+urllib.request.urlretrieve(url, filename)
+img = Image.open(filename).convert('RGB')
+tensor = transform(img).unsqueeze(0) # transform and add batch dimension
 
-# Add a title and axis labels
-plt.title("Training Loss vs Training Steps")
-plt.xlabel("Training Steps")
-plt.ylabel("Training Loss")
+# get the model predictions
+with torch.no_grad():
+    out = model(tensor)
+probabilities = torch.nn.functional.softmax(out[0], dim=0)
+print(probabilities.shape)
+# prints: torch.Size([1000])
 
-# Save the plot
-plt.savefig("reports/figures/lossV1.png")
+# get the top-5 predictions
+# Get imagenet class mappings
+url, filename = ("https://raw.githubusercontent.com/pytorch/hub/master/imagenet_classes.txt", "imagenet_classes.txt")
+urllib.request.urlretrieve(url, filename) 
+with open("imagenet_classes.txt", "r") as f:
+    categories = [s.strip() for s in f.readlines()]
 
-torch.save(model.state_dict(), 'models/trained_modelV1.pt')
+# Print top categories per image
+top5_prob, top5_catid = torch.topk(probabilities, 5)
+for i in range(top5_prob.size(0)):
+    print(categories[top5_catid[i]], top5_prob[i].item())
 
-# # Test the model
-# model.eval()
-# with torch.no_grad():
-#     correct = 0
-#     total = 0
-#     for i, (inputs, labels) in enumerate(dataloader):
-#         outputs = model(inputs)
-#         _, predicted = torch.max(outputs.data, 1)
-#         total += labels.size(0)
-#         correct += (predicted == labels).sum().item()
+# save model
+def save_model():
 
-# # Print the accuracy
-# print('Accuracy of the model on the test images: {} %'.format(100 * correct / total))
+    torch.save(model.state_dict(), 'checkpoint.pth')
