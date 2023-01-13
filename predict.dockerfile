@@ -18,6 +18,8 @@ RUN pip install -r requirements.txt --no-cache-dir
 # RUN pip install torch torchvision torchaudio --extra-index-url https://download.pytorch.org/whl/cpu --no-cache-dir # TODO: uncomment this
 
 # and finally our own module
-# RUN pip install -e .
+RUN pip install -e .
 
-ENTRYPOINT ["python", "-u", "mlops_finalproject/models/train_model.py"]
+ENTRYPOINT ["python", "-u", "mlops_finalproject/models/predict_model.py"]
+
+# ENTRYPOINT ["/bin/bash"]

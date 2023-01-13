@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 black
 # flake8
 isort
@@ -16,3 +17,13 @@ python-dotenv==0.21.0
 setuptools==65.6.3
 tqdm
 -e .
+=======
+# black
+# flake8
+# isort
+# pip
+# python-dotenv
+# setuptools
+# wheel
+-e .
+>>>>>>> 30a8e1f (Dockerfiles done but I commented all installs because Im flying)
