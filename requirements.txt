@@ -1,4 +1,5 @@
 <<<<<<< HEAD
+<<<<<<< HEAD
 black
 # flake8
 isort
@@ -25,5 +26,14 @@ tqdm
 # python-dotenv
 # setuptools
 # wheel
+=======
+black
+flake8
+isort
+pip
+python-dotenv
+setuptools
+wheel
+>>>>>>> d5fbdcc (Finish Initial docker)
 -e .
 >>>>>>> 30a8e1f (Dockerfiles done but I commented all installs because Im flying)

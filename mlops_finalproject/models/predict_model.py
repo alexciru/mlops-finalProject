@@ -1,5 +1,6 @@
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 from torch.utils.data import DataLoader, TensorDataset
 #from mlops_finalproject.models import model
 import torch
@@ -102,6 +103,9 @@ import torch
 >>>>>>> 8218a7e (files for dockerization)
 =======
 # import torch # TODO: uncomment this
+=======
+import torch
+>>>>>>> d5fbdcc (Finish Initial docker)
 
 print("Predicting")
 >>>>>>> 30a8e1f (Dockerfiles done but I commented all installs because Im flying)

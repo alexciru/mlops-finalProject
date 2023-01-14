@@ -12,10 +12,10 @@ COPY reports/ reports/
 COPY models/ models/
 
 WORKDIR /
-# RUN pip install --upgrade pip # TODO: uncomment this
+RUN pip install --upgrade pip
 RUN pip install -r requirements.txt --no-cache-dir
 # torch cpu requires special command
-# RUN pip install torch torchvision torchaudio --extra-index-url https://download.pytorch.org/whl/cpu --no-cache-dir # TODO: uncomment this
+RUN pip install torch torchvision torchaudio --extra-index-url https://download.pytorch.org/whl/cpu --no-cache-dir
 
 # and finally our own module
 RUN pip install -e .
