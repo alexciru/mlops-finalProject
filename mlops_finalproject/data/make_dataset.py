@@ -8,6 +8,7 @@ import os
 import pandas as pd
 from pathlib import Path
 from dotenv import find_dotenv, load_dotenv
+from tqdm import tqdm
 
 
 @click.command()
@@ -31,10 +32,12 @@ def main(input_filepath: str, output_filepath:str):
 
     train_imgs = []
     train_labels = []
-    for img, label in train_dataset:
-        flatten_tensor = torch.flatten(img, start_dim=0)
-        train_imgs.append(flatten_tensor)
+    for it, (img, label) in tqdm(enumerate(train_dataset)):
+        #flatten_tensor = torch.flatten(img, start_dim=0)
+        train_imgs.append(img)  #flatten_tensor)
         train_labels.append(label)
+        if it >= 10:    #Testing purpose, only generate 11 images
+            break
 
 
     # # Join all of the data
