@@ -2,29 +2,27 @@
 import torch
 import torch.nn as nn
 import torchvision.transforms as transforms
-from torch.utils.data import DataLoader, TensorDataset
-from model import ModifiedMobileNetV3
+from torch.utils.data import DataLoader
+from torchvision.datasets import TensorDataset
+from model.py import model
 import matplotlib.pyplot as plt
 
 #Hyperparameters
 num_epochs = 20
 
-# # Define the data transforms
-# data_transforms = transforms.Compose([
-#     transforms.Resize(256),
-#     transforms.CenterCrop(224),
-#     transforms.ToTensor(),
-#     transforms.Normalize([0.485, 0.456, 0.406], [0.229, 0.224, 0.225])
-# ])
+# Define the data transforms
+data_transforms = transforms.Compose([
+    transforms.Resize(256),
+    transforms.CenterCrop(224),
+    transforms.ToTensor(),
+    transforms.Normalize([0.485, 0.456, 0.406], [0.229, 0.224, 0.225])
+])
 
 # Load the dataset
 images = torch.load("data/processed/images.pt")
 labels = torch.load("data/processed/labels.pt")
-train_dataset = TensorDataset(images, labels)
+train_dataset = TensorDataset(images, labels, transform=data_transforms)
 trainloader = DataLoader(train_dataset, batch_size=64, shuffle=True) 
-
-#Creating a instance of the model
-model = ModifiedMobileNetV3(num_classes=43)
 
 # Define the loss function and optimizer
 criterion = nn.CrossEntropyLoss()
@@ -35,7 +33,7 @@ losses = []
 model.train
 for epoch in range(num_epochs):
     running_loss = 0
-    for i, (inputs, labels) in enumerate(trainloader):
+    for i, (inputs, labels) in enumerate(dataloader):
         optimizer.zero_grad()
         outputs = model(inputs)
         loss = criterion(outputs, labels)
