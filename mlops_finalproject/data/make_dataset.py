@@ -22,7 +22,11 @@ def main(input_filepath: str, output_filepath:str):
     logger.info('making final data set from raw data')
 
    # Train files -  organized in folders from labels
-    transform = transforms.Compose([transforms.Resize([30, 30]), transforms.ToTensor()])
+    transform = transforms.Compose([
+        transforms.Resize([224, 224]),
+        transforms.ToTensor(),
+        transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])
+        ])
     train_dataset = datasets.ImageFolder(input_filepath, transform=transform)
 
     # test files -  labels in csv
@@ -32,13 +36,12 @@ def main(input_filepath: str, output_filepath:str):
 
     train_imgs = []
     train_labels = []
-    for it, (img, label) in tqdm(enumerate(train_dataset)):
+    for iter, (img, label) in tqdm(enumerate(train_dataset)):
         #flatten_tensor = torch.flatten(img, start_dim=0)
         train_imgs.append(img)  #flatten_tensor)
         train_labels.append(label)
-        if it >= 10:    #Testing purpose, only generate 11 images
+        if iter > 10:
             break
-
 
     # # Join all of the data
     # final_imgs = []
@@ -57,8 +60,6 @@ def main(input_filepath: str, output_filepath:str):
     logger.info('data store successfully')
     #torch.save(final_imgs, f"{output_filepath}/images.pt")
     #torch.save(final_labels, f"{output_filepath}/labels.pt")
-
-
 
 
 if __name__ == '__main__':

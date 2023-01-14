@@ -20,7 +20,10 @@ num_epochs = 20
 # Load the dataset
 images = torch.load("data/processed/images.pt")
 labels = torch.load("data/processed/labels.pt")
-train_dataset = TensorDataset(images, labels)
+labels = labels.type(torch.LongTensor)
+print(images.shape)
+print(labels[0:12].shape)
+train_dataset = TensorDataset(images, labels[0:12])
 trainloader = DataLoader(train_dataset, batch_size=64, shuffle=True) 
 
 #Creating a instance of the model
@@ -32,6 +35,7 @@ optimizer = torch.optim.SGD(model.parameters(), lr=0.001, momentum=0.9)
 
 # Train the model
 losses = []
+steps = 0
 model.train
 for epoch in range(num_epochs):
     running_loss = 0
@@ -49,7 +53,7 @@ for epoch in range(num_epochs):
 
 
 # Use the plot function to draw a line plot
-plt.plot(steps, losses)
+plt.plot(range(steps), losses)
 
 # Add a title and axis labels
 plt.title("Training Loss vs Training Steps")
