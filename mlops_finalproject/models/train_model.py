@@ -20,21 +20,7 @@ class MyDataset(Dataset):
         return self.images[idx], self.labels[idx]
 
 #Hyperparameters
-num_epochs = 2
-
-# # Define the data transforms
-# data_transforms = transforms.Compose([
-#     transforms.Resize(256),
-#     transforms.CenterCrop(224),
-#     transforms.ToTensor(),
-#     transforms.Normalize([0.485, 0.456, 0.406], [0.229, 0.224, 0.225])
-# ])
-
-# Load the dataset
-#images = torch.load("data/processed/images.pt")
-#labels = torch.load("data/processed/labels.pt")
-#train_dataset = TensorDataset(images, labels)
-#trainloader = DataLoader(train_dataset, batch_size=128, shuffle=True) 
+num_epochs = 5
 
 # my own version of dataset loading
 dataset = MyDataset('data/processed/images.pt', 'data/processed/labels.pt')

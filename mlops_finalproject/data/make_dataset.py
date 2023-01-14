@@ -30,11 +30,6 @@ def main(input_filepath: str, output_filepath:str):
 
     train_dataset = datasets.ImageFolder(input_filepath, transform=transform)
 
-    # test files -  labels in csv
-    # test_info = pd.read_csv(input_filepath + '/Test.csv')
-    # test_labels = test_info["ClassId"].values
-    # imgs = test_info["Path"].values
-
     train_imgs = []
     train_labels = []
     for img, label in train_dataset:
@@ -42,15 +37,6 @@ def main(input_filepath: str, output_filepath:str):
         train_imgs.append(img)
         train_labels.append(label)
 
-
-    # # Join all of the data
-    # final_imgs = []
-    # final_imgs = train_dataset.imgs
-    # final_imgs = final_imgs.append(test_imgs)
-
-    # final_labels = []
-    # final_labels = train_dataset.classes
-    # final_labels.append(test_labels)
     train_images = torch.stack(train_imgs)
     train_labels = torch.Tensor(train_dataset.targets)
 
@@ -58,9 +44,6 @@ def main(input_filepath: str, output_filepath:str):
     torch.save(train_images, f"{output_filepath}/images.pt")
     torch.save(train_labels, f"{output_filepath}/labels.pt")
     logger.info('data store successfully')
-    #torch.save(final_imgs, f"{output_filepath}/images.pt")
-    #torch.save(final_labels, f"{output_filepath}/labels.pt")
-
 
 if __name__ == '__main__':
     log_fmt = '%(asctime)s - %(name)s - %(levelname)s - %(message)s'
