@@ -6,6 +6,8 @@ from torch.utils.data import DataLoader, TensorDataset
 from model import ModifiedMobileNetV3
 import matplotlib.pyplot as plt
 from torch.utils.data import Dataset
+import wandb
+import random
 
 class MyDataset(Dataset):
     def __init__(self, images_path, labels_path):
@@ -20,7 +22,21 @@ class MyDataset(Dataset):
         return self.images[idx], self.labels[idx]
 
 #Hyperparameters
-num_epochs = 5
+num_epochs = 2
+learning_rate = 0.001        
+
+wandb.init(
+    # set the wandb project where this run will be logged
+    project="mlops_finalProject",
+    
+    # track hyperparameters and run metadata
+    config={
+    "learning_rate": learning_rate,
+    "architecture": "CNN",
+    "dataset": "GTSRB",
+    "epochs": num_epochs,
+    }
+)
 
 # my own version of dataset loading
 dataset = MyDataset('data/processed/images.pt', 'data/processed/labels.pt')
@@ -29,9 +45,12 @@ trainloader = DataLoader(dataset, batch_size=128, shuffle=True)
 #Creating a instance of the model
 model = ModifiedMobileNetV3(num_classes=43)
 
+#init the wandb logging
+wandb.watch(model, log_freq=100)
+
 # Define the loss function and optimizer
 criterion = nn.CrossEntropyLoss()
-optimizer = torch.optim.SGD(model.parameters(), lr=0.001, momentum=0.9)
+optimizer = torch.optim.SGD(model.parameters(), lr=learning_rate, momentum=0.9)
 
 # Train the model
 losses = []
@@ -47,6 +66,8 @@ for epoch in range(num_epochs):
         loss.backward()
         optimizer.step()
         running_loss += loss.item()
+
+        wandb.log({"loss": running_loss})
     else:
         losses.append(running_loss/len(trainloader))
         steps += 1
