@@ -22,12 +22,19 @@ def main(input_filepath: str, output_filepath:str):
 
    # Train files -  organized in folders from labels
     transform = transforms.Compose([
+<<<<<<< HEAD
     transforms.Resize([224, 224]),
     transforms.RandomHorizontalFlip(),
     transforms.RandomRotation(10),
     transforms.ToTensor(),
     transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5))])
 
+=======
+        transforms.Resize([224, 224]),
+        transforms.ToTensor(),
+        transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])
+        ])
+>>>>>>> 113ee0b78434c66fc51323ca556837ec97099316
     train_dataset = datasets.ImageFolder(input_filepath, transform=transform)
 
     # test files -  labels in csv
@@ -37,11 +44,18 @@ def main(input_filepath: str, output_filepath:str):
 
     train_imgs = []
     train_labels = []
+<<<<<<< HEAD
     for img, label in train_dataset:
+=======
+    for img, label in tqdm(train_dataset):
+>>>>>>> 113ee0b78434c66fc51323ca556837ec97099316
         #flatten_tensor = torch.flatten(img, start_dim=0)
         train_imgs.append(img)
         train_labels.append(label)
+<<<<<<< HEAD
 
+=======
+>>>>>>> 113ee0b78434c66fc51323ca556837ec97099316
 
     # # Join all of the data
     # final_imgs = []
@@ -60,8 +74,6 @@ def main(input_filepath: str, output_filepath:str):
     logger.info('data store successfully')
     #torch.save(final_imgs, f"{output_filepath}/images.pt")
     #torch.save(final_labels, f"{output_filepath}/labels.pt")
-
-
 
 
 if __name__ == '__main__':
