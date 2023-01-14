@@ -36,12 +36,10 @@ def main(input_filepath: str, output_filepath:str):
 
     train_imgs = []
     train_labels = []
-    for iter, (img, label) in tqdm(enumerate(train_dataset)):
+    for img, label in tqdm(train_dataset):
         #flatten_tensor = torch.flatten(img, start_dim=0)
         train_imgs.append(img)  #flatten_tensor)
         train_labels.append(label)
-        if iter > 10:
-            break
 
     # # Join all of the data
     # final_imgs = []

@@ -5,9 +5,10 @@ import torchvision.transforms as transforms
 from torch.utils.data import DataLoader, TensorDataset
 from model import ModifiedMobileNetV3
 import matplotlib.pyplot as plt
+from tqdm import tqdm 
 
 #Hyperparameters
-num_epochs = 20
+num_epochs = 5
 
 # # Define the data transforms
 # data_transforms = transforms.Compose([
@@ -21,8 +22,6 @@ num_epochs = 20
 images = torch.load("data/processed/images.pt")
 labels = torch.load("data/processed/labels.pt")
 labels = labels.type(torch.LongTensor)
-print(images.shape)
-print(labels[0:12].shape)
 train_dataset = TensorDataset(images, labels[0:12])
 trainloader = DataLoader(train_dataset, batch_size=64, shuffle=True) 
 
@@ -39,7 +38,7 @@ steps = 0
 model.train
 for epoch in range(num_epochs):
     running_loss = 0
-    for i, (inputs, labels) in enumerate(trainloader):
+    for i, (inputs, labels) in tqdm(enumerate(trainloader)):
         optimizer.zero_grad()
         outputs = model(inputs)
         loss = criterion(outputs, labels)
