@@ -1,0 +1,77 @@
+{
+    "os": "Linux-5.15.0-58-generic-x86_64-with-glibc2.35",
+    "python": "3.10.6",
+    "heartbeatAt": "2023-01-16T10:28:15.958026",
+    "startedAt": "2023-01-16T10:28:15.093591",
+    "docker": null,
+    "cuda": null,
+    "args": [],
+    "state": "running",
+    "program": "/home/javi/Desktop/DTU/courses/2_term/mlops-finalProject/mlops_finalproject/models/train_model.py",
+    "codePath": "mlops_finalproject/models/train_model.py",
+    "git": {
+        "remote": "git@github.com:alexciru/mlops-finalProject.git",
+        "commit": "67302254931d493da990ca99b88f4f1033726557"
+    },
+    "email": "vatojavier@gmail.com",
+    "root": "/home/javi/Desktop/DTU/courses/2_term/mlops-finalProject",
+    "host": "javi-HP",
+    "username": "javi",
+    "executable": "/home/javi/.virtualenvs/mlops-project/bin/python",
+    "cpu_count": 4,
+    "cpu_count_logical": 8,
+    "cpu_freq": {
+        "current": 2562.59875,
+        "min": 400.0,
+        "max": 4700.0
+    },
+    "cpu_freq_per_core": [
+        {
+            "current": 2460.158,
+            "min": 400.0,
+            "max": 4700.0
+        },
+        {
+            "current": 1240.632,
+            "min": 400.0,
+            "max": 4700.0
+        },
+        {
+            "current": 2800.0,
+            "min": 400.0,
+            "max": 4700.0
+        },
+        {
+            "current": 2800.0,
+            "min": 400.0,
+            "max": 4700.0
+        },
+        {
+            "current": 2800.0,
+            "min": 400.0,
+            "max": 4700.0
+        },
+        {
+            "current": 2800.0,
+            "min": 400.0,
+            "max": 4700.0
+        },
+        {
+            "current": 2800.0,
+            "min": 400.0,
+            "max": 4700.0
+        },
+        {
+            "current": 2800.0,
+            "min": 400.0,
+            "max": 4700.0
+        }
+    ],
+    "disk": {
+        "total": 233.98657608032227,
+        "used": 125.22112274169922
+    },
+    "memory": {
+        "total": 11.34130859375
+    }
+}
