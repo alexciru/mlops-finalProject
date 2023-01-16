@@ -7,9 +7,10 @@ RUN apt update && \
 COPY requirements.txt requirements.txt
 COPY setup.py setup.py
 COPY mlops_finalproject/ mlops_finalproject/
-COPY data/ data/
 COPY reports/ reports/
 COPY models/ models/
+
+RUN dvc pull
 
 WORKDIR /
 RUN pip install --upgrade pip
