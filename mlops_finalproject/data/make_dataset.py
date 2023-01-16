@@ -22,7 +22,7 @@ def main(input_filepath: str, output_filepath:str):
 
    # Train files -  organized in folders from labels
     transform = transforms.Compose([
-    transforms.Resize([224, 224]),
+    transforms.Resize([32, 32]),
     transforms.RandomHorizontalFlip(),
     transforms.RandomRotation(10),
     transforms.ToTensor(),
