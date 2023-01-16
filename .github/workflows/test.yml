@@ -30,7 +30,7 @@ jobs:
     # dvc - download
     - uses: iterative/setup-dvc@v1
     - name: Get data
-      run: dvc pull
+      run: dvc pull data/processed
       env:
         GDRIVE_CREDENTIALS_DATA: ${{ secrets.GDRIVE_CREDENTIALS_DATA }}
 
