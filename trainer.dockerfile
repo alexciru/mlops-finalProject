@@ -16,7 +16,9 @@ RUN pip install -r requirements.txt --no-cache-dir
 # torch cpu requires special command
 RUN pip install torch torchvision torchaudio --extra-index-url https://download.pytorch.org/whl/cpu --no-cache-dir
 
-
+# DVC
+COPY data.dvc data.dvc
+RUN pip install dvc 'dvc[gs]'
 RUN dvc init --no-scm
 RUN dvc remote add -d remote gs://german-signs-bucket/
 RUN dvc pull
