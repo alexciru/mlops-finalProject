@@ -40,7 +40,7 @@ wandb.init(
 # my own version of dataset loading
 dataset = MyDataset('data/processed/images.pt', 'data/processed/labels.pt')
 print(len(dataset))
-trainloader = DataLoader(dataset, batch_size=128, shuffle=True)
+trainloader = DataLoader(dataset, batch_size=64, shuffle=True)
 
 # Split the dataset into test and train
 train_dataset, test_dataset = random_split(trainloader, [0.8, 0.2])
