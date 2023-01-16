@@ -30,7 +30,7 @@ def main(input_filepath: str, output_filepath: str, num_images: int):
             transforms.RandomHorizontalFlip(),
             transforms.RandomRotation(10),
             transforms.ToTensor(),
-            transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5)),
+            # transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5)),
         ]
     )
 
@@ -47,14 +47,15 @@ def main(input_filepath: str, output_filepath: str, num_images: int):
     train_labels = []
     it = 0
     for img, label in tqdm(train_loader):
-        # flatten_tensor = torch.flatten(img, start_dim=0)
         # breakpoint()
-        # img = img.view(3, 224, 224)
-        train_imgs.append(img)
+        mean = img.mean().item()
+        std = img.std().item()
+
+        transform_norm = transforms.Compose([transforms.Normalize(mean, std)])
+        img_normalized = transform_norm(img)
+
+        train_imgs.append(img_normalized)
         train_labels.append(label)
-        it +=1
-        if it >= 5000:
-            break
 
     train_images = torch.stack(train_imgs)
     train_labels = torch.Tensor(train_dataset.targets)
