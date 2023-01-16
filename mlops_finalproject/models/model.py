@@ -1,18 +1,13 @@
-import torch
 import torch.nn as nn
-import torchvision.models as models
+import timm
 
-# import the MobileNetV3 model
-model = models.mobilenet_v3(pretrained=True)
+class ModifiedMobileNetV3(nn.Module):
+    def __init__(self, num_classes=1000):
+        super(ModifiedMobileNetV3, self).__init__()
+        self.base_model = timm.create_model('mobilenetv3_large_100', pretrained=True)
+        in_features = self.base_model.classifier.in_features
+        self.base_model.classifier = nn.Linear(in_features, num_classes)
 
-# change the last layer to have a different number of output classes
-model.classifier[1] = nn.Linear(in_features=1280, out_features=10, bias=True)
-
-# Freeze the layers
-for param in model.parameters():
-    param.requiresGrad = False
-
-# unfreeze the last layer
-for param in model.classifier[1].parameters():
-    param.requiresGrad = True
-
+    def forward(self, x):
+        x = self.base_model(x)
+        return x
