@@ -63,6 +63,7 @@ for epoch in range(num_epochs):
     print(f"epoch: {epoch+1}/{num_epochs}")
     running_loss = 0
     for i, (inputs, labels) in enumerate(trainloader, 0):
+        # breakpoint()
         optimizer.zero_grad()
         outputs = model(inputs)
         loss = criterion(outputs, labels)
