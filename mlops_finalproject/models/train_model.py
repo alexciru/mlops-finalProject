@@ -1,11 +1,10 @@
-# Import necessary libraries
 import torch
 import torch.nn as nn
 import torchvision.transforms as transforms
 from torch.utils.data import DataLoader, TensorDataset
 from model import ModifiedMobileNetV3
 import matplotlib.pyplot as plt
-from torch.utils.data import Dataset
+from torch.utils.data import Dataset, random_split
 import wandb
 import random
 
@@ -22,7 +21,7 @@ class MyDataset(Dataset):
         return self.images[idx], self.labels[idx]
 
 #Hyperparameters
-num_epochs = 2
+num_epochs = 3
 learning_rate = 0.001        
 
 wandb.init(
@@ -40,7 +39,11 @@ wandb.init(
 
 # my own version of dataset loading
 dataset = MyDataset('data/processed/images.pt', 'data/processed/labels.pt')
+print(len(dataset))
 trainloader = DataLoader(dataset, batch_size=128, shuffle=True)
+
+# Split the dataset into test and train
+train_dataset, test_dataset = random_split(trainloader, [0.8, 0.2])
 
 #Creating a instance of the model
 model = ModifiedMobileNetV3(num_classes=43)
