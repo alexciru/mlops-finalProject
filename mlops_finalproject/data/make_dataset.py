@@ -8,12 +8,15 @@ import os
 import pandas as pd
 from pathlib import Path
 from dotenv import find_dotenv, load_dotenv
+from torch.utils.data import Subset, DataLoader
+from tqdm import tqdm
 
 
 @click.command()
 @click.argument('input_filepath', type=click.Path(exists=True))
 @click.argument('output_filepath', type=click.Path())
-def main(input_filepath: str, output_filepath:str):
+@click.option('-n', '--num-images', required=False, type=int)
+def main(input_filepath: str, output_filepath:str, num_images:int):
     """ Runs data processing scripts to turn raw data from (../raw) into
         cleaned data ready to be analyzed (saved in ../processed).
     """
@@ -30,9 +33,16 @@ def main(input_filepath: str, output_filepath:str):
 
     train_dataset = datasets.ImageFolder(input_filepath, transform=transform)
 
+    if num_images is None:
+        num_images = len(train_dataset)
+    
+    indices = range(0, num_images)
+    subset = Subset(train_dataset, indices)
+    train_loader = DataLoader(subset, batch_size=1, shuffle=True)
+
     train_imgs = []
     train_labels = []
-    for img, label in train_dataset:
+    for img, label in tqdm(train_loader):
         #flatten_tensor = torch.flatten(img, start_dim=0)
         train_imgs.append(img)
         train_labels.append(label)
