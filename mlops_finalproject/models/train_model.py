@@ -1,10 +1,10 @@
 import torch
 import torch.nn as nn
 import torchvision.transforms as transforms
-from torch.utils.data import DataLoader, TensorDataset
+from torch.utils.data import DataLoader
 from model import ModifiedMobileNetV3
 import matplotlib.pyplot as plt
-from torch.utils.data import Dataset, random_split
+from torch.utils.data import Dataset
 import wandb
 import random
 
@@ -21,7 +21,7 @@ class MyDataset(Dataset):
         return self.images[idx], self.labels[idx]
 
 #Hyperparameters
-num_epochs = 3
+num_epochs = 5
 learning_rate = 0.001        
 
 wandb.init(
@@ -41,9 +41,6 @@ wandb.init(
 dataset = MyDataset('data/processed/images.pt', 'data/processed/labels.pt')
 print(len(dataset))
 trainloader = DataLoader(dataset, batch_size=128, shuffle=True)
-
-# Split the dataset into test and train
-train_dataset, test_dataset = random_split(trainloader, [0.8, 0.2])
 
 #Creating a instance of the model
 model = ModifiedMobileNetV3(num_classes=43)
@@ -86,9 +83,9 @@ plt.xlabel("Training Steps")
 plt.ylabel("Training Loss")
 
 # Save the plot
-plt.savefig("reports/figures/lossV1.png")
+plt.savefig("reports/figures/loss_64img.png")
 
-torch.save(model.state_dict(), 'models/trained_modelV1.pt')
+torch.save(model.state_dict(), 'models/trained_model_64img.pt')
 
 # # Test the model
 model.eval()

@@ -1,5 +1,4 @@
 from torch.utils.data import DataLoader, TensorDataset
-#from mlops_finalproject.models import model
 import torch
 import click
 import logging
@@ -9,6 +8,7 @@ import pandas as pd
 from PIL import Image
 import numpy as np
 from torchvision import transforms
+from model import ModifiedMobileNetV3
 
 
 def get_data(path: str) -> list:
@@ -19,7 +19,12 @@ def get_data(path: str) -> list:
     test_labels = test["ClassId"].values
 
     test_imgs = []
-    transform = transforms.Compose([transforms.Resize([30, 30]), transforms.ToTensor()])
+    transform = transforms.Compose([
+        transforms.Resize([32, 32]),
+        transforms.RandomHorizontalFlip(),
+        transforms.RandomRotation(10),
+        transforms.ToTensor(),
+        transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5))])
 
     for img_path in paths:
         fullpath = path + "/" + img_path
@@ -36,62 +41,51 @@ def get_data(path: str) -> list:
     return output
 
 
-
-
-# @click.command()
-# @click.argument("model_checkpoint", type=click.Path(exists=True))
-# @click.argument("data_path", type=click.Path(exists=True))
-# def main(model_checkpoint, data_path):
+def main():
 #     """Runs data processing scripts to turn raw data from (../raw) into
 #     cleaned data ready to be analyzed (saved in ../processed).
 #     """
-#     logger = logging.getLogger(__name__)
-#     logger.info("Using model in inference")
-#     print(model_checkpoint)
+    images, labels = get_data("data/raw/German")
+    test_dataset = TensorDataset(images, labels)
+    testloader = DataLoader(test_dataset, batch_size=64)
+    print("testloader worked")
 
-#     mymodel = model.MyAwesomeModel(784, 10)
-#     mymodel.load_state_dict(torch.load(model_checkpoint))
-
-#     images, labels = get_data(data_path)
-#     images = normalize_data(images)
-
-#     test_dataset = TensorDataset(images, labels)  # create your datset
-#     testloader = DataLoader(
-#         test_dataset, batch_size=64
-#     )  # create your dataloader
-
-#     with torch.no_grad():
-#         for images, labels in testloader:
-#             # resize images
-#             images = images.view(images.shape[0], -1)
-
-#             mymodel.eval()
-#             logps = mymodel.forward(images)
-#             ps = torch.exp(logps)
-
-#             # Take max from the probs
-#             top_p, top_class = ps.topk(1, dim=1)
-
-#             # Compare with labels
-#             equals = top_class == labels.view(*top_class.shape)
-
-#             # mean
-#             accuracy = torch.mean(equals.type(torch.FloatTensor))
-
-#     print(f'Accuracy: {accuracy.item()*100}%')
-
+    # Init the model.
+    model = ModifiedMobileNetV3(num_classes=43)
+    # Load previously saved model parameters.
+    state_dict = torch.load('models/trained_modelV2.pt')
+    model.load_state_dict(state_dict)
+    print("Model loaded succesfully")
 
     
+    with torch.no_grad():
+         for images, labels in testloader:
 
-# if __name__ == "__main__":
-#     log_fmt = "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
-#     logging.basicConfig(level=logging.INFO, format=log_fmt)
+             model.eval()
+             logps = model.forward(images)
+             ps = torch.exp(logps)
+             # Take max from the probs
+             top_p, top_class = ps.topk(1, dim=1)
 
-#     # not used in this stub but often useful for finding various files
-#     project_dir = Path(__file__).resolve().parents[2]
+             # Compare with labels
+             equals = top_class == labels.view(*top_class.shape)
 
-#     # find .env automagically by walking up directories until it's found, then
-#     # load up the .env entries as environment variables
-#     load_dotenv(find_dotenv())
+             # mean
+             accuracy = torch.mean(equals.type(torch.FloatTensor))
 
-#     main()
+
+    print("Model evaluation complete.")
+    print(f'Accuracy: {accuracy.item()*100}%')
+    
+if __name__ == "__main__":
+     log_fmt = "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
+     logging.basicConfig(level=logging.INFO, format=log_fmt)
+
+     # not used in this stub but often useful for finding various files
+     project_dir = Path(__file__).resolve().parents[2]
+
+     # find .env automagically by walking up directories until it's found, then
+     # load up the .env entries as environment variables
+     load_dotenv(find_dotenv())
+
+     main()
