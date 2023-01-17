@@ -68,7 +68,9 @@ def get_val_data(path: str) -> list:
 
 wandb.init(
     # set the wandb project where this run will be logged
-    project="mlops_finalProject",
+    project="test-project",
+    entity="mlops_finalproject",
+
     # track hyperparameters and run metadata
     # config={
     # "learning_rate": learning_rate,
