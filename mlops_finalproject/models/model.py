@@ -4,16 +4,18 @@ import pytorch_lightning as pl
 import torchvision.models as models
 import torch
 import torch.nn.functional as F
+from tqdm import tqdm
 
-
-def build_model(pretrained=False, fine_tune=True, num_classes=43):
+def build_model(pretrained=True, fine_tune=True, num_classes=43):
     if pretrained:
         print('[INFO]: Loading pre-trained weights')
+        model = models.mobilenet_v3_small(weights=models.MobileNet_V3_Small_Weights.DEFAULT)
     else:
         print('[INFO]: Not loading pre-trained weights')
-
-    # model = models.mobilenet_v3_small(weights=models.MobileNet_V3_Large_Weights.DEFAULT)
-    model = models.mobilenet_v3_small(weights=models.MobileNet_V3_Small_Weights.DEFAULT)
+        model = models.mobilenet_v3_small()
+        
+        # model = models.mobilenet_v3_small(weights=models.MobileNet_V3_Large_Weights.DEFAULT)
+    
     if fine_tune:
         print('[INFO]: Fine-tuning all layers...')
         for params in model.parameters():
@@ -24,75 +26,51 @@ def build_model(pretrained=False, fine_tune=True, num_classes=43):
             params.requires_grad = False
 
     # Change the final classification head.
-    model.classifier[3] = nn.Linear(in_features=1024, out_features=num_classes)
+    num_ftrs = model.classifier[-1].in_features
+    model.classifier[-1] = nn.Linear(in_features=num_ftrs, out_features=num_classes)
+
     return model
 
 
 class MobileNetV3Lightning(pl.LightningModule):
     # criterion = nn.NLLLoss()
-    criterion = nn.CrossEntropyLoss()
     def __init__(self, num_classes=43, pretained=False):
         super().__init__()
         self.model = build_model()
+        self.optimizer = optim.Adam(self.model.parameters(), lr=0.01)#, weight_decay=0.1)
+        self.criterion = nn.CrossEntropyLoss()
+
 
     def forward(self, x: torch.Tensor):
         x = self.model(x)
-        # x = F.log_softmax(x, dim=1)
+        #x = F.log_softmax(x, dim=1)
         # breakpoint()
 
         return x
 
-    def training_step(self, batch, batch_idx):
-        images, labels = batch
+    def training_step(self, images, labels):
+        self.model.train()
+        self.optimizer.zero_grad()
         # images = images.view(images.shape[0], -1)
-        output = self(images)
+        output = self.model(images)
         loss = self.criterion(output, labels)
+        loss.backward()
+        self.optimizer.step()
         self.log('train_loss', loss)
-
-        _, preds = torch.max(output.data, 1)
-
+        preds = torch.argmax(F.log_softmax(output, dim=1), 1)
         # train_running_correct += (preds == labels).sum().item()
 
-        return loss
+        return loss, preds
 
-    def configure_optimizers(self):
-        # params =
-        optimizer = optim.Adam(self.parameters(), lr=0.01)
-        return optimizer
-
-    # def validation_step(self, data):
-
-    #     return 
-    
-    def test_step(self, batch, batch_idx):
-        images, labels = batch
-
-        # resize images
-        # images = images.view(images.shape[0], -1)
-
-        # Old stuff
-        # logps = self(images)
-        # # logps = mymodel.forward(images)
-        # ps = torch.exp(logps)
-
-
-        # # Take max from the probs
-        # top_p, top_class = ps.topk(1, dim=1)
-
-        # # Compare with labels
-        # equals = top_class == labels.view(*top_class.shape)
-
-        # # mean
-        # accuracy = torch.mean(equals.type(torch.FloatTensor))
-        # self.log('test_accuracy', accuracy)
-        # return accuracy
-
-        # New stuff
-        outputs = self(images)
-        loss = self.criterion(outputs, labels)
-
-        _, preds = torch.max(outputs.data, 1)
-        # acc = torch.mean((torch.argmax(preds, dim=1) == labels).float())
-        acc = torch.mean((preds == labels).float())
-        self.log("test_acc", acc)
-        
+    # Test the model
+    def test_model(self, testloader):
+        self.model.eval()
+        with torch.no_grad():
+            correct = 0
+            for (inputs, labels) in tqdm(testloader):
+                outputs = self.model(inputs)
+                outputs = F.log_softmax(outputs, dim=1)
+                predicted = torch.argmax(outputs.data, 1)
+                correct += predicted.eq(labels.data).cpu().sum()
+        acc = correct / len(testloader.dataset) * 100
+        return acc
