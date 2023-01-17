@@ -77,6 +77,10 @@ for epoch in range(num_epochs):
     for (inputs, labels) in tqdm(trainloader):
         loss_, preds_ = model.training_step(inputs, labels)
         running_loss += loss_.item()
+
+    # Optional: Decrease lr
+    # model.optimizer.param_groups[0]['lr'] *= 60
+
     wandb.log({"Train loss": running_loss/len(trainloader)})
     losses.append(running_loss/len(trainloader))
     steps += 1
