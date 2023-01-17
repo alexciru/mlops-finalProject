@@ -91,3 +91,5 @@ target/
 /data
 
 wandb/
+lightning_logs/
+mlops_finalProject/

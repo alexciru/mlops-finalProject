@@ -1,107 +1,133 @@
 import torch
 import torch.nn as nn
-import torchvision.transforms as transforms
 from torch.utils.data import DataLoader, TensorDataset
-from model import ModifiedMobileNetV3
+import pytorch_lightning as pl
 import matplotlib.pyplot as plt
 from torch.utils.data import Dataset, random_split
 import wandb
-import random
+from pytorch_lightning.loggers import WandbLogger
+from mlops_finalproject.models import model
+from pytorch_lightning import Callback, Trainer
+from torchvision import transforms
+import pandas as pd
+from PIL import Image
 
 class MyDataset(Dataset):
     def __init__(self, images_path, labels_path):
         self.images = torch.load(images_path)
         self.labels = torch.load(labels_path)
         self.labels = self.labels.type(torch.LongTensor)
-        
+
     def __len__(self):
         return len(self.images)
-    
+
     def __getitem__(self, idx):
         return self.images[idx], self.labels[idx]
 
-#Hyperparameters
-num_epochs = 3
-learning_rate = 0.001        
+
+class MetricTracker(Callback):
+    def __init__(self):
+        self.collection = []
+
+    def on_train_epoch_end(self, trainer: "pl.Trainer", pl_module: "pl.LightningModule"):
+        elogs = trainer.logged_metrics
+        self.collection.append(elogs["train_loss"])
+
+
+def get_val_data(path: str) -> list:
+    """ Funtion to load the folders with the imgs to predict
+    """
+    test = pd.read_csv(path + '/Test.csv')
+    paths = test["Path"].values
+    test_labels = test["ClassId"].values
+
+    test_imgs = []
+    transform = transforms.Compose(
+        [
+        transforms.Resize([32, 32]),
+        #transforms.RandomHorizontalFlip(),
+        #transforms.RandomRotation(10),
+        transforms.ToTensor(),
+        #transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5))
+        ]
+    )
+
+    for img_path in paths:
+        fullpath = path + "/" + img_path
+        img = Image.open(fullpath)
+
+        tensor = transform(img) # Resize and convert to tensor
+        test_imgs.append(tensor)
+
+    output = [
+        torch.stack(test_imgs),
+        torch.tensor(test_labels),
+    ]
+
+    return output
 
 wandb.init(
     # set the wandb project where this run will be logged
     project="test-project",
     entity="mlops_finalproject",
 
-    
     # track hyperparameters and run metadata
-    config={
-    "learning_rate": learning_rate,
-    "architecture": "CNN",
-    "dataset": "GTSRB",
-    "epochs": num_epochs,
-    }
+    # config={
+    # "learning_rate": learning_rate,
+    # "architecture": "CNN",
+    # "dataset": "GTSRB",
+    # "epochs": num_epochs,
+    # }
 )
 
-# my own version of dataset loading
-dataset = MyDataset('data/processed/images.pt', 'data/processed/labels.pt')
-print(len(dataset))
-trainloader = DataLoader(dataset, batch_size=64, shuffle=True)
+images = torch.load("data/processed/images.pt")
+labels = torch.load("data/processed/labels.pt")
+breakpoint()
+traindataset = TensorDataset(images, labels)
+trainloader = DataLoader(traindataset, batch_size=64, shuffle=False, num_workers=8)
 
-# Split the dataset into test and train
-train_dataset, test_dataset = random_split(trainloader, [0.8, 0.2])
+#validation set
+val_images, val_labels = get_val_data("data/raw/German")
+val_dataset = TensorDataset(val_images, val_labels)  # create your datset
+val_loader = DataLoader(
+    val_dataset, batch_size=64, num_workers=8
+)  # create your dataloader
 
-#Creating a instance of the model
-model = ModifiedMobileNetV3(num_classes=43)
+mn_model = model.MobileNetV3Lightning(43, False)
 
-#init the wandb logging
-wandb.watch(model, log_freq=100)
+wandb.watch(mn_model, log_freq=100)
 
-# Define the loss function and optimizer
-criterion = nn.CrossEntropyLoss()
-optimizer = torch.optim.SGD(model.parameters(), lr=learning_rate, momentum=0.9)
+data = torch.randn(64, 3, 32, 32)
+output = mn_model(data)
 
-# Train the model
-losses = []
-steps = 0
-model.train
-for epoch in range(num_epochs):
-    print(f"epoch: {epoch+1}/{num_epochs}")
-    running_loss = 0
-    for i, (inputs, labels) in enumerate(trainloader, 0):
-        optimizer.zero_grad()
-        outputs = model(inputs)
-        loss = criterion(outputs, labels)
-        loss.backward()
-        optimizer.step()
-        running_loss += loss.item()
+cb = MetricTracker()
+trainer = Trainer(
+    max_epochs=5,
+    callbacks=[cb],
+    limit_train_batches=0.2,
+    logger=WandbLogger(project="mlops_finalProject"),
+)
 
-        wandb.log({"loss": running_loss})
-    else:
-        losses.append(running_loss/len(trainloader))
-        steps += 1
-        print(f"Training loss: {running_loss/len(trainloader)}")
+# for img, labels in trainloader:
+#     breakpoint()
 
+trainer.fit(mn_model, train_dataloaders=trainloader)
+
+trainer.test(mn_model,  trainloader)
+
+# Create plot for training loss
+losses = [i.item() for i in cb.collection]
+steps = [i for i in range(len(losses))]
 
 # Use the plot function to draw a line plot
-plt.plot(range(steps), losses)
+plt.plot(steps, losses)
 
 # Add a title and axis labels
-plt.title("Training Loss vs Training Steps")
+plt.title("Training Loss vs Training Steps with Ligthning")
 plt.xlabel("Training Steps")
 plt.ylabel("Training Loss")
 
-# Save the plot
+# # Save the plot
 plt.savefig("reports/figures/lossV1.png")
 
-torch.save(model.state_dict(), 'models/trained_modelV1.pt')
-
-# # Test the model
-model.eval()
-with torch.no_grad():
-     correct = 0
-     total = 0
-     for i, (inputs, labels) in enumerate(trainloader):
-         outputs = model(inputs)
-         _, predicted = torch.max(outputs.data, 1)
-         total += labels.size(0)
-         correct += (predicted == labels).sum().item()
-
-# # Print the accuracy
-print('Accuracy of the model on the test images: {} %'.format(100 * correct / total))
+torch.save(mn_model.state_dict(), "models/trained_modelLightning.pt")

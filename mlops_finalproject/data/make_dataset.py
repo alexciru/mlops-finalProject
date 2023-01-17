@@ -27,8 +27,8 @@ def main(input_filepath: str, output_filepath: str, num_images: int):
     transform = transforms.Compose(
         [
             transforms.Resize([32, 32]),
-            transforms.RandomHorizontalFlip(),
-            transforms.RandomRotation(10),
+            # transforms.RandomHorizontalFlip(),
+            # transforms.RandomRotation(10),
             transforms.ToTensor(),
             # transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5)),
         ]
@@ -45,20 +45,23 @@ def main(input_filepath: str, output_filepath: str, num_images: int):
 
     train_imgs = []
     train_labels = []
-    it = 0
     for img, label in tqdm(train_loader):
         # breakpoint()
         mean = img.mean().item()
         std = img.std().item()
 
-        transform_norm = transforms.Compose([transforms.Normalize(mean, std)])
-        img_normalized = transform_norm(img)
+        # transform_norm = transforms.Compose([transforms.Normalize(mean, std)])
+        # img_normalized = transform_norm(img)
+        img_normalized = img
 
         train_imgs.append(img_normalized)
-        train_labels.append(label)
+        train_labels.append(label.item())
+    
+    # train_labels2 = [l.item() for l in train_labels]
+    # breakpoint()
 
     train_images = torch.stack(train_imgs)
-    train_labels = torch.Tensor(train_dataset.targets)
+    train_labels = torch.Tensor(train_dataset.targets).long()
     # breakpoint()
     train_images = train_images.view(num_images, 3, 32, 32)
 
