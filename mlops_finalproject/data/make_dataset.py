@@ -10,13 +10,41 @@ from pathlib import Path
 from dotenv import find_dotenv, load_dotenv
 from torch.utils.data import Subset, DataLoader
 from tqdm import tqdm
+import matplotlib.pyplot as plt
+import random
+
+
+def get_sample(images_tensor, labels, n, size):
+    N = images_tensor.shape[0]
+
+    # Get a random set of indices
+    indices = random.sample(range(N), n*n)
+
+    # Get the corresponding images
+    images = images_tensor[indices]
+    labels = labels[indices]
+
+    # Create a figure and axes
+    fig, axs = plt.subplots(n, n, figsize=(12, 12))
+
+    # Loop through the axes and plot each image
+    for i in range(n):
+        for j in range(n):
+            axs[i, j].imshow(np.transpose(images[i*n+j], (1, 2, 0)))
+            axs[i, j].axis('off')
+            axs[i, j].set_title(labels[i*n+j].item())
+
+    # Display the plot
+    # plt.show()
+    fig.savefig(f"reports/figures/processed_samples/proc_samples_{size}.png")
 
 
 @click.command()
 @click.argument("input_filepath", type=click.Path(exists=True))
 @click.argument("output_filepath", type=click.Path())
 @click.option("-n", "--num-images", required=False, type=int)
-def main(input_filepath: str, output_filepath: str, num_images: int):
+@click.option("-s", "--size", required=False, type=int)
+def main(input_filepath: str, output_filepath: str, num_images: int, size=32):
     """Runs data processing scripts to turn raw data from (../raw) into
     cleaned data ready to be analyzed (saved in ../processed).
     """
@@ -26,7 +54,7 @@ def main(input_filepath: str, output_filepath: str, num_images: int):
     # Train files -  organized in folders from labels
     transform = transforms.Compose(
         [
-            transforms.Resize([32, 32]),
+            transforms.Resize([size, size]),
             # transforms.RandomHorizontalFlip(),
             # transforms.RandomRotation(10),
             transforms.ToTensor(),
@@ -41,7 +69,7 @@ def main(input_filepath: str, output_filepath: str, num_images: int):
 
     indices = range(0, num_images)
     subset = Subset(train_dataset, indices)
-    train_loader = DataLoader(subset, batch_size=1, shuffle=True)
+    train_loader = DataLoader(subset, batch_size=1, shuffle=False)
 
     train_imgs = []
     train_labels = []
@@ -54,20 +82,30 @@ def main(input_filepath: str, output_filepath: str, num_images: int):
         # img_normalized = transform_norm(img)
         img_normalized = img
 
-        train_imgs.append(img_normalized)
+        train_imgs.append(img_normalized[0])
         train_labels.append(label.item())
-    
-    # train_labels2 = [l.item() for l in train_labels]
-    # breakpoint()
+
+
+        # Plot img
+        # img2 = img.view(3,size,size)
+        # plt.imshow(img2.permute(1, 2, 0))
+        # plt.show()
+
+    train_labels = np.array(train_labels)
+    train_labels = torch.from_numpy(train_labels).long()
 
     train_images = torch.stack(train_imgs)
-    train_labels = torch.Tensor(train_dataset.targets).long()
     # breakpoint()
-    train_images = train_images.view(num_images, 3, 32, 32)
+
+    # Save plot of random images
+    get_sample(train_images, train_labels, 6, size)
+
+    if not os.path.exists(f"{output_filepath}/{size}"):
+        os.makedirs(f"{output_filepath}/{size}")
 
     # Store data
-    torch.save(train_images, f"{output_filepath}/images.pt")
-    torch.save(train_labels, f"{output_filepath}/labels.pt")
+    torch.save(train_images, f"{output_filepath}/{size}/images.pt")
+    torch.save(train_labels, f"{output_filepath}/{size}/labels.pt")
     logger.info("data store successfully")
 
 
