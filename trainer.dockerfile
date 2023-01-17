@@ -21,7 +21,7 @@ COPY data.dvc data.dvc
 RUN pip install dvc 'dvc[gs]'
 RUN dvc init --no-scm
 RUN dvc remote add -d remote gs://german-signs-bucket/
-RUN dvc pull
+RUN dvc pull data/processed
 
 # and finally our own module
 RUN pip install -e .
