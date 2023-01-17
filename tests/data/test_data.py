@@ -34,7 +34,7 @@ def test_load_data_shape():
 
     for batch, __ in trainloader:
         for img in batch:
-            assert img.shape ==  torch.Size([2700]), "Img have a incorrect size"
+            assert img.shape ==  torch.Size([3, 32, 32]), "Img have a incorrect size"
 
 
 

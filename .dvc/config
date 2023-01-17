@@ -1,7 +1,5 @@
 [core]
     remote = remote_storage
-['remote "storage"']
-    url = gdrive://1-d6AyIAybokViyjT2KUUEdLGEk_xK-kw
 ['remote "remote_storage"']
     url = gs://german-signs-bucket/
 
