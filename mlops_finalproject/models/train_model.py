@@ -26,7 +26,9 @@ learning_rate = 0.001
 
 wandb.init(
     # set the wandb project where this run will be logged
-    project="mlops_finalProject",
+    project="test-project",
+    entity="mlops_finalproject",
+
     
     # track hyperparameters and run metadata
     config={
