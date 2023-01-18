@@ -96,7 +96,12 @@ class MobileNetV3Lightning(pl.LightningModule):
         self.log("val_accuracy", np.mean(validation_step_outputs)*100)
 
     def predict_step(self, batch, batch_idx, dataloader_idx: int = 0):
-        return 69
+        imgs, label = batch
+        outputs = self.model(imgs)
+        outputs = F.log_softmax(outputs, dim=1)
+        predicted = torch.argmax(outputs.data, 1)
+
+        return predicted
 
 
     # Test the model

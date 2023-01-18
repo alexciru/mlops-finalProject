@@ -132,22 +132,30 @@ def main(model_checkpoint, data_path):
             # transforms.RandomRotation(10),
         ]
     )
+
+    max_images = 4
+    ir = 0
     images = []
     for element in os.listdir(data_path):
         img = Image.open(f"{data_path}/{element}")
         img = transform(img).unsqueeze(0)
         images.append(img)
         # print(element)
+        ir += 1
+        if ir >= max_images:
+            break
 
     images_tensor = torch.stack(images)
+    images_tensor = images_tensor.view(images_tensor.shape[0],3,32,32)
     fake_labels = [i for i in range(images_tensor.shape[0])]
-
+    # breakpoint()
     dataset = TensorDataset(images_tensor, torch.tensor(fake_labels))
     dataloader = DataLoader(dataset, batch_size=1, shuffle=False)
 
     trainer = Trainer()
-    prediction = trainer.predict(mymodel, dataloaders=dataloader)
-    print(f"Prediction: {prediction}")
+    preds = trainer.predict(mymodel, dataloaders=dataloader)
+    predictions = [p.item() for p in preds]
+    print(f"Prediction: {predictions}")
 
 
 if __name__ == "__main__":
