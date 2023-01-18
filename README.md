@@ -28,6 +28,15 @@ Optional `-n` argument to process only specified amount of images
 
 `python mlops_finalproject/data/make_dataset.py  data/raw/German/Train  data/processed/ -n 300`
 
+
+# Predict in inference
+
+It needs
+- Argument for the model checkpoint
+- Argument with a directory with only images
+
+`python mlops_finalproject/models/predict_model.py models/trained_model_timm_lightning.pt data/raw/German/Test/`
+
 # Docker
 ## Trainer
 Build Docker with

@@ -122,18 +122,15 @@ def main(model_checkpoint, data_path):
     mymodel.load_state_dict(torch.load(model_checkpoint))
 
     # test loader
-    # transform = transforms.Compose([transforms.ToTensor()])
     transform = transforms.Compose(
         [
             transforms.ToTensor(),
             transforms.Resize([32, 32]),
             transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5)),
-            # transforms.RandomHorizontalFlip(),
-            # transforms.RandomRotation(10),
         ]
     )
 
-    max_images = 4
+    max_images = 300
     ir = 0
     images = []
     for element in os.listdir(data_path):
