@@ -15,8 +15,8 @@ from datetime import datetime
 
 
 #Hyperparameters
-num_epochs = 1
-learning_rate = 0.01        
+num_epochs = 10
+learning_rate = 0.001        
 
 wandb.init(
     # set the wandb project where this run will be logged
