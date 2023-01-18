@@ -70,7 +70,7 @@ model = MobileNetV3Lightning(num_classes=43)
 
 
 trainer = Trainer(
-    max_epochs=1, callbacks=[metrics], logger=WandbLogger(project="mlops_finalProject")
+    max_epochs=9, callbacks=[metrics], logger=WandbLogger(project="mlops_finalProject")
 )
 wandb.watch(model, log_freq=100)
 
@@ -95,9 +95,13 @@ plt.savefig("reports/figures/val_acc_64img.png")
 # Save the plot
 # save weights locally
 timestamp = datetime.today().strftime('%Y%m%d_%H%M')
-name = f"trained_model_32img_{timestamp}.pt"
+name = f"inference_model_32img_{timestamp}.pt"
 
 torch.save(model.state_dict(), 'models/' + name)
+
+script = model.to_torchscript()
+torch.jit.save(script, "models/model_for_inference.pt")
+script.save('models/model_for_inference2.pt')
 
 storage_client = storage.Client()
 bucket = storage_client.get_bucket("training-bucket-mlops") 
