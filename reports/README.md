@@ -56,7 +56,7 @@ be installed with `pip install click markdown`.
 >
 > Example:
 >
-> *s222913, sXXXXXX, sXXXXXX*
+> *s222913, s222999, sXXXXXX*
 >
 > Answer:
 

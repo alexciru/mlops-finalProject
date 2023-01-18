@@ -1,13 +1,21 @@
-import torch.nn as nn
-import timm
+from torch import nn, optim
+import torch.nn.functional as F
 
-class ModifiedMobileNetV3(nn.Module):
-    def __init__(self, num_classes=1000):
-        super(ModifiedMobileNetV3, self).__init__()
-        self.base_model = timm.create_model('mobilenetv3_large_100', pretrained=True)
-        in_features = self.base_model.classifier.in_features
-        self.base_model.classifier = nn.Linear(in_features, num_classes)
-
+class Classifier(nn.Module):
+    def __init__(self, num_classes=43):
+        super().__init__()
+        self.fc1 = nn.Linear(3072, 256)
+        self.fc2 = nn.Linear(256, 128)
+        self.fc3 = nn.Linear(128, 64)
+        self.fc4 = nn.Linear(64, 43)
+        
     def forward(self, x):
-        x = self.base_model(x)
+        # make sure input tensor is flattened
+        x = x.view(x.shape[0], -1)
+        
+        x = F.relu(self.fc1(x))
+        x = F.relu(self.fc2(x))
+        x = F.relu(self.fc3(x))
+        x = F.log_softmax(self.fc4(x), dim=1)
+        
         return x

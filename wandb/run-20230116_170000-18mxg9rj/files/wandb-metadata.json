@@ -1,0 +1,50 @@
+{
+    "os": "Windows-10-10.0.22621-SP0",
+    "python": "3.10.8",
+    "heartbeatAt": "2023-01-16T16:00:01.815852",
+    "startedAt": "2023-01-16T16:00:00.567330",
+    "docker": null,
+    "cuda": null,
+    "args": [],
+    "state": "running",
+    "program": "C:\\Users\\micha\\OneDrive\\Pulpit\\DTU\\02476\\mlops-finalProject\\mlops_finalproject\\models\\train_model.py",
+    "codePath": "mlops_finalproject\\models\\train_model.py",
+    "git": {
+        "remote": "https://github.com/alexciru/mlops-finalProject.git",
+        "commit": "aafc20ec064cf6bfeddc316a8ebccd293af0fed1"
+    },
+    "email": "michallehwark511@gmail.com",
+    "root": "C:/Users/micha/OneDrive/Pulpit/DTU/02476/mlops-finalProject",
+    "host": "Mike",
+    "username": "micha",
+    "executable": "C:\\Users\\micha\\anaconda3\\envs\\02476_MLOps\\python.exe",
+    "cpu_count": 8,
+    "cpu_count_logical": 16,
+    "cpu_freq": {
+        "current": 2508.0,
+        "min": 0.0,
+        "max": 3201.0
+    },
+    "cpu_freq_per_core": [
+        {
+            "current": 2508.0,
+            "min": 0.0,
+            "max": 3201.0
+        }
+    ],
+    "disk": {
+        "total": 930.7180824279785,
+        "used": 353.474365234375
+    },
+    "gpu": "NVIDIA GeForce RTX 3060 Laptop GPU",
+    "gpu_count": 1,
+    "gpu_devices": [
+        {
+            "name": "NVIDIA GeForce RTX 3060 Laptop GPU",
+            "memory_total": 6442450944
+        }
+    ],
+    "memory": {
+        "total": 15.24422836303711
+    }
+}

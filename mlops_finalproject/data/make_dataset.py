@@ -8,46 +8,71 @@ import os
 import pandas as pd
 from pathlib import Path
 from dotenv import find_dotenv, load_dotenv
-
+from torch.utils.data import Subset, DataLoader
+from tqdm import tqdm
 
 
 @click.command()
-@click.argument('input_filepath', type=click.Path(exists=True))
-@click.argument('output_filepath', type=click.Path())
-def main(input_filepath: str, output_filepath:str):
-    """ Runs data processing scripts to turn raw data from (../raw) into
-        cleaned data ready to be analyzed (saved in ../processed).
+@click.argument("input_filepath", type=click.Path(exists=True))
+@click.argument("output_filepath", type=click.Path())
+@click.option("-n", "--num-images", required=False, type=int)
+def main(input_filepath: str, output_filepath: str, num_images: int):
+    """Runs data processing scripts to turn raw data from (../raw) into
+    cleaned data ready to be analyzed (saved in ../processed).
     """
     logger = logging.getLogger(__name__)
-    logger.info('making final data set from raw data')
+    logger.info("making final data set from raw data")
 
-   # Train files -  organized in folders from labels
-    transform = transforms.Compose([
-    transforms.Resize([32, 32]),
-    transforms.RandomHorizontalFlip(),
-    transforms.RandomRotation(10),
-    transforms.ToTensor(),
-    transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5))])
+    # Train files -  organized in folders from labels
+    transform = transforms.Compose(
+        [
+            transforms.Resize([32, 32]),
+            #ransforms.RandomHorizontalFlip(),
+            #transforms.RandomRotation(10),
+            transforms.ToTensor(),
+            # transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5)),
+        ]
+    )
 
     train_dataset = datasets.ImageFolder(input_filepath, transform=transform)
 
+    if num_images is None:
+        num_images = len(train_dataset)
+
+    indices = range(0, num_images)
+    subset = Subset(train_dataset, indices)
+    train_loader = DataLoader(subset, batch_size=1, shuffle=True)
+
     train_imgs = []
     train_labels = []
-    for img, label in train_dataset:
-        #flatten_tensor = torch.flatten(img, start_dim=0)
-        train_imgs.append(img)
+
+    for img, label in tqdm(train_loader):
+        # breakpoint()
+        mean = img.mean().item()
+        std = img.std().item()
+
+        transform_norm = transforms.Compose([transforms.Normalize(mean, std)])
+        img_normalized = transform_norm(img)
+
+        flatten_tensor = torch.flatten(img_normalized, start_dim=0)
+        train_imgs.append(flatten_tensor)  #flatten_tensor)
+
+        #train_imgs.append(img_normalized)
         train_labels.append(label)
 
     train_images = torch.stack(train_imgs)
     train_labels = torch.Tensor(train_dataset.targets)
+    # breakpoint()
+    #train_images = train_images.view(num_images, 3, 32, 32)
 
     # Store data
     torch.save(train_images, f"{output_filepath}/images.pt")
     torch.save(train_labels, f"{output_filepath}/labels.pt")
-    logger.info('data store successfully')
+    logger.info("data store successfully")
 
-if __name__ == '__main__':
-    log_fmt = '%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+
+if __name__ == "__main__":
+    log_fmt = "%(asctime)s - f%(name)s - %(levelname)s - %(message)s"
     logging.basicConfig(level=logging.INFO, format=log_fmt)
 
     # not used in this stub but often useful for finding various files
