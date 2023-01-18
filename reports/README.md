@@ -166,7 +166,7 @@ The total code coverage is X%. Despite being close to 100% does not mean that th
 >
 > Answer:
 
-We used both branches and pull requests in our project. In our group , every time we needed to implement a feature we created a new brach based on the main branch. Once the implementation was finished and the unit testing passing then we proceed to push the code into Github and created a pull request. This pull request was then accepted (if possible by another member) and then merge into the main branch. This helped us stay organices and divide the work into different and independent features.
+In our project we used both branches and pull requests for software version control. First we distributed tasks among group members, one person was responsible for creating the project structure and creating remote repository. Then rest of the members were invited to join the repository. All main features of the project were developed on separate branches. Once the feature has been developed person responsible was responsible for creating unit tests for this part. After the tests were implemented the code from branch has been pushed to the main. We only used pull requests on the branches that passed all the implemented tests and were accepted (if possible by another member). This process turned out to be beneficial in terms of maintaining the good quality of code and not introducing error to the main branch. Once the code from the develop branch has been merged with the main branch all members were notified that new version of exists and they should pull it to their local main branch.  
 
 ### Question 10
 
