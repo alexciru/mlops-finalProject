@@ -11,19 +11,7 @@ from pytorch_lightning import Callback, Trainer
 from torchvision import transforms
 import pandas as pd
 from PIL import Image
-
-class MyDataset(Dataset):
-    def __init__(self, images_path, labels_path):
-        self.images = torch.load(images_path)
-        self.labels = torch.load(labels_path)
-        self.labels = self.labels.type(torch.LongTensor)
-
-    def __len__(self):
-        return len(self.images)
-
-    def __getitem__(self, idx):
-        return self.images[idx], self.labels[idx]
-
+from torchvision import transforms, datasets
 
 class MetricTracker(Callback):
     def __init__(self):
@@ -78,10 +66,16 @@ wandb.init(
     # }
 )
 
-images = torch.load("data/processed/images.pt")
-labels = torch.load("data/processed/labels.pt")
-breakpoint()
-traindataset = TensorDataset(images, labels)
+#images = torch.load("data/processed/images.pt")
+#labels = torch.load("data/processed/labels.pt")
+#traindataset = TensorDataset(images, labels)
+transform = transforms.Compose(
+        [
+            transforms.Resize([32, 32]),
+            transforms.ToTensor()
+        ]
+    )
+traindataset = datasets.ImageFolder('data/raw/German/Train' , transform=transform)
 trainloader = DataLoader(traindataset, batch_size=64, shuffle=False, num_workers=8)
 
 #validation set
@@ -91,7 +85,7 @@ val_loader = DataLoader(
     val_dataset, batch_size=64, num_workers=8
 )  # create your dataloader
 
-mn_model = model.MobileNetV3Lightning(43, False)
+mn_model = model.MobileNetV3Lightning(43, True)
 
 wandb.watch(mn_model, log_freq=100)
 
@@ -100,7 +94,7 @@ output = mn_model(data)
 
 cb = MetricTracker()
 trainer = Trainer(
-    max_epochs=5,
+    max_epochs=2,
     callbacks=[cb],
     limit_train_batches=0.2,
     logger=WandbLogger(project="mlops_finalProject"),
