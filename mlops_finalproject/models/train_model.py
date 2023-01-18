@@ -1,133 +1,106 @@
 import torch
 import torch.nn as nn
-from torch.utils.data import DataLoader, TensorDataset
-import pytorch_lightning as pl
+import torchvision.transforms as transforms
+from torch.utils.data import DataLoader
+from model import MobileNetV3Lightning
 import matplotlib.pyplot as plt
-from torch.utils.data import Dataset, random_split
+from torch.utils.data import Dataset
 import wandb
-from pytorch_lightning.loggers import WandbLogger
-from mlops_finalproject.models import model
-from pytorch_lightning import Callback, Trainer
-from torchvision import transforms
-import pandas as pd
-from PIL import Image
+import random
+import os
+from tqdm import tqdm
+
+#Hyperparameters
+num_epochs = 10
+learning_rate = 0.001        
+
+wandb.init(
+    # set the wandb project where this run will be logged
+    project="mlops_finalProject",
+    
+    # track hyperparameters and run metadata
+    config={
+    "learning_rate": learning_rate,
+    "architecture": "CNN",
+    "dataset": "GTSRB",
+    "epochs": num_epochs,
+    }
+)
+
 
 class MyDataset(Dataset):
-    def __init__(self, images_path, labels_path):
-        self.images = torch.load(images_path)
-        self.labels = torch.load(labels_path)
-        self.labels = self.labels.type(torch.LongTensor)
+    def __init__(self, train, path):
 
+        if train:
+            self.images_path = os.path.join(path, "train", "images.pt")
+            self.labels_path = os.path.join(path, "train", "labels.pt")
+
+        else:
+            self.images_path = os.path.join(path, "test", "images.pt")
+            self.labels_path = os.path.join(path, "test", "labels.pt")
+
+        self.images = torch.load(self.images_path)
+        self.labels = torch.load(self.labels_path)
+        self.labels = self.labels.type(torch.LongTensor)
+        
     def __len__(self):
         return len(self.images)
-
+    
     def __getitem__(self, idx):
         return self.images[idx], self.labels[idx]
 
 
-class MetricTracker(Callback):
-    def __init__(self):
-        self.collection = []
-
-    def on_train_epoch_end(self, trainer: "pl.Trainer", pl_module: "pl.LightningModule"):
-        elogs = trainer.logged_metrics
-        self.collection.append(elogs["train_loss"])
 
 
-def get_val_data(path: str) -> list:
-    """ Funtion to load the folders with the imgs to predict
-    """
-    test = pd.read_csv(path + '/Test.csv')
-    paths = test["Path"].values
-    test_labels = test["ClassId"].values
+# my own version of dataset loading
+train_dataset = MyDataset(True, 'data/processed')
+print(len(train_dataset))
+trainloader = DataLoader(train_dataset, batch_size=128, shuffle=True)
 
-    test_imgs = []
-    transform = transforms.Compose(
-        [
-        transforms.Resize([32, 32]),
-        #transforms.RandomHorizontalFlip(),
-        #transforms.RandomRotation(10),
-        transforms.ToTensor(),
-        #transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5))
-        ]
-    )
+# test loader
+test_dataset = MyDataset(False, 'data/processed')
+print(len(test_dataset))
+testloader = DataLoader(test_dataset, batch_size=128, shuffle=False)
 
-    for img_path in paths:
-        fullpath = path + "/" + img_path
-        img = Image.open(fullpath)
+#Creating a instance of the model
+model = MobileNetV3Lightning(num_classes=43)
 
-        tensor = transform(img) # Resize and convert to tensor
-        test_imgs.append(tensor)
+#init the wandb logging
+wandb.watch(model, log_freq=100)
 
-    output = [
-        torch.stack(test_imgs),
-        torch.tensor(test_labels),
-    ]
+# Train the model
+losses = []
+steps = 0
+for epoch in range(num_epochs):
+    print(f"epoch: {epoch+1}/{num_epochs}")
+    running_loss = 0
+    for (inputs, labels) in tqdm(trainloader):
+        loss_, preds_ = model.training_step(inputs, labels)
+        running_loss += loss_.item()
 
-    return output
+    # Optional: Decrease lr
+    # model.optimizer.param_groups[0]['lr'] *= 60
 
-wandb.init(
-    # set the wandb project where this run will be logged
-    project="test-project",
-    entity="mlops_finalproject",
-
-    # track hyperparameters and run metadata
-    # config={
-    # "learning_rate": learning_rate,
-    # "architecture": "CNN",
-    # "dataset": "GTSRB",
-    # "epochs": num_epochs,
-    # }
-)
-
-images = torch.load("data/processed/images.pt")
-labels = torch.load("data/processed/labels.pt")
-breakpoint()
-traindataset = TensorDataset(images, labels)
-trainloader = DataLoader(traindataset, batch_size=64, shuffle=False, num_workers=8)
-
-#validation set
-val_images, val_labels = get_val_data("data/raw/German")
-val_dataset = TensorDataset(val_images, val_labels)  # create your datset
-val_loader = DataLoader(
-    val_dataset, batch_size=64, num_workers=8
-)  # create your dataloader
-
-mn_model = model.MobileNetV3Lightning(43, False)
-
-wandb.watch(mn_model, log_freq=100)
-
-data = torch.randn(64, 3, 32, 32)
-output = mn_model(data)
-
-cb = MetricTracker()
-trainer = Trainer(
-    max_epochs=5,
-    callbacks=[cb],
-    limit_train_batches=0.2,
-    logger=WandbLogger(project="mlops_finalProject"),
-)
-
-# for img, labels in trainloader:
-#     breakpoint()
-
-trainer.fit(mn_model, train_dataloaders=trainloader)
-
-trainer.test(mn_model,  trainloader)
-
-# Create plot for training loss
-losses = [i.item() for i in cb.collection]
-steps = [i for i in range(len(losses))]
+    wandb.log({"Train loss": running_loss/len(trainloader)})
+    losses.append(running_loss/len(trainloader))
+    steps += 1
+    print(f"Training loss: {running_loss/len(trainloader)}")   
+    # # Print the accuracy
+    train_acc = model.test_model(trainloader)
+    test_acc = model.test_model(testloader)
+    wandb.log({"Train Acc": train_acc})
+    wandb.log({"Test Acc": test_acc})
+    print('Accuracy of the model on the train images: {} %'.format(train_acc))
+    print('Accuracy of the model on the test images: {} %'.format(test_acc))
 
 # Use the plot function to draw a line plot
-plt.plot(steps, losses)
+plt.plot(range(steps), losses)
 
 # Add a title and axis labels
-plt.title("Training Loss vs Training Steps with Ligthning")
+plt.title("Training Loss vs Training Steps")
 plt.xlabel("Training Steps")
 plt.ylabel("Training Loss")
 
-# # Save the plot
-plt.savefig("reports/figures/lossV1.png")
-
-torch.save(mn_model.state_dict(), "models/trained_modelLightning.pt")
+# Save the plot
+plt.savefig("reports/figures/loss_64img.png")
+torch.save(model.state_dict(), 'models/trained_model_64img.pt')
