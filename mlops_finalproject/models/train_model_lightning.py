@@ -12,6 +12,9 @@ from tqdm import tqdm
 from pytorch_lightning import Callback, Trainer
 import pytorch_lightning as pl
 from pytorch_lightning.loggers import WandbLogger
+from datetime import datetime
+from google.cloud import storage
+import pickle
 
 
 class MyDataset(Dataset):
@@ -67,7 +70,7 @@ model = MobileNetV3Lightning(num_classes=43)
 
 
 trainer = Trainer(
-    max_epochs=7, callbacks=[metrics], logger=WandbLogger(project="mlops_finalProject")
+    max_epochs=1, callbacks=[metrics], logger=WandbLogger(project="mlops_finalProject")
 )
 wandb.watch(model, log_freq=100)
 
@@ -89,5 +92,15 @@ plt.xlabel("Epoch")
 plt.ylabel("Validation accuracy")
 plt.savefig("reports/figures/val_acc_64img.png")
 
+# Save the plot
+# save weights locally
+timestamp = datetime.today().strftime('%Y%m%d_%H%M')
+name = f"trained_model_32img_{timestamp}.pt"
 
-# breakpoint()
+torch.save(model.state_dict(), 'models/' + name)
+
+storage_client = storage.Client()
+bucket = storage_client.get_bucket("training-bucket-mlops") 
+blob = bucket.blob(name)
+blob.upload_from_filename('models/' + name)
+print(f"Succesfully push the weights {name} into: {bucket}")

@@ -93,3 +93,4 @@ target/
 wandb/
 lightning_logs/
 mlops_finalProject/
+models

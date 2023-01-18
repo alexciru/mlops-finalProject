@@ -9,23 +9,12 @@ import wandb
 import random
 import os
 from tqdm import tqdm
-
-#Hyperparameters
-num_epochs = 10
-learning_rate = 0.001        
-
-wandb.init(
-    # set the wandb project where this run will be logged
-    project="mlops_finalProject",
-    
-    # track hyperparameters and run metadata
-    config={
-    "learning_rate": learning_rate,
-    "architecture": "CNN",
-    "dataset": "GTSRB",
-    "epochs": num_epochs,
-    }
-)
+from pytorch_lightning import Callback, Trainer
+import pytorch_lightning as pl
+from pytorch_lightning.loggers import WandbLogger
+from datetime import datetime
+from google.cloud import storage
+import pickle
 
 
 class MyDataset(Dataset):
@@ -42,65 +31,76 @@ class MyDataset(Dataset):
         self.images = torch.load(self.images_path)
         self.labels = torch.load(self.labels_path)
         self.labels = self.labels.type(torch.LongTensor)
-        
+
     def __len__(self):
         return len(self.images)
-    
+
     def __getitem__(self, idx):
         return self.images[idx], self.labels[idx]
 
 
+class MetricTracker(Callback):
+    def __init__(self):
+        self.training_losses = []
+        self.validation_accuracies = []
 
-# my own version of dataset loading
-train_dataset = MyDataset(True, 'data/processed')
-print(len(train_dataset))
-trainloader = DataLoader(train_dataset, batch_size=128, shuffle=True)
+    def on_train_epoch_end(self, trainer: "pl.Trainer", pl_module: "pl.LightningModule"):
+        elogs = trainer.logged_metrics
+        self.training_losses.append(elogs["train_loss"])
 
-# test loader
-test_dataset = MyDataset(False, 'data/processed')
-print(len(test_dataset))
-testloader = DataLoader(test_dataset, batch_size=128, shuffle=False)
 
-#Creating a instance of the model
+    def on_validation_epoch_end(self, trainer: "pl.Trainer", pl_module: "pl.LightningModule"):
+        elogs = trainer.logged_metrics
+        self.validation_accuracies.append(elogs["val_accuracy"])
+
+# wandb.init(
+#     # set the wandb project where this run will be logged
+#     project="mlops_finalProject",
+# )
+
+
+train_dataset = MyDataset(True, "data/processed")
+trainloader = DataLoader(train_dataset, batch_size=128, shuffle=True, num_workers=8)
+
+test_dataset = MyDataset(False, "data/processed")
+testloader = DataLoader(test_dataset, batch_size=128, shuffle=False, num_workers=8)
+
+metrics = MetricTracker()
 model = MobileNetV3Lightning(num_classes=43)
 
-#init the wandb logging
+
+trainer = Trainer(
+    max_epochs=1, callbacks=[metrics], logger=WandbLogger(project="mlops_finalProject")
+)
 wandb.watch(model, log_freq=100)
 
-# Train the model
-losses = []
-steps = 0
-for epoch in range(num_epochs):
-    print(f"epoch: {epoch+1}/{num_epochs}")
-    running_loss = 0
-    for (inputs, labels) in tqdm(trainloader):
-        breakpoint()
-        loss_, preds_ = model.training_step(inputs, labels)
-        running_loss += loss_.item()
+trainer.fit(model, trainloader, val_dataloaders=testloader)
+torch.save(model.state_dict(), 'models/trained_model_timm_lightning.pt')
 
-    # Optional: Decrease lr
-    # model.optimizer.param_groups[0]['lr'] *= 60
-
-    wandb.log({"Train loss": running_loss/len(trainloader)})
-    losses.append(running_loss/len(trainloader))
-    steps += 1
-    print(f"Training loss: {running_loss/len(trainloader)}")   
-    # # Print the accuracy
-    train_acc = model.test_model(trainloader)
-    test_acc = model.test_model(testloader)
-    wandb.log({"Train Acc": train_acc})
-    wandb.log({"Test Acc": test_acc})
-    print('Accuracy of the model on the train images: {} %'.format(train_acc))
-    print('Accuracy of the model on the test images: {} %'.format(test_acc))
-
-# Use the plot function to draw a line plot
-plt.plot(range(steps), losses)
-
+plt.plot(range(len(metrics.training_losses)), metrics.training_losses)
 # Add a title and axis labels
 plt.title("Training Loss vs Training Steps")
 plt.xlabel("Training Steps")
 plt.ylabel("Training Loss")
+plt.savefig("reports/figures/loss_64img.png")
+plt.close()
+
+
+plt.plot(range(len(metrics.validation_accuracies)), metrics.validation_accuracies)
+plt.title("validation accuracies vs Epochs Steps")
+plt.xlabel("Epoch")
+plt.ylabel("Validation accuracy")
+plt.savefig("reports/figures/val_acc_64img.png")
 
 # Save the plot
-plt.savefig("reports/figures/loss_64img.png")
-torch.save(model.state_dict(), 'models/trained_model_64img.pt')
+# save weights locally
+timestamp = datetime.today().strftime('%Y%m%d_%H%M')
+name = f"trained_model_32img_{timestamp}.pt"
+
+torch.save(model.state_dict(), 'models/' + name)
+
+storage_client = storage.Client()
+bucket = storage_client.get_bucket("training-bucket-mlops") 
+blob = bucket.blob(name)
+blob.upload_from_filename('models/' + name)
+print(f"Succesfully push the weights {name} into: {bucket}")
