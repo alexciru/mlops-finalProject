@@ -49,8 +49,6 @@ def main(input_filepath: str, output_filepath: str, num_images: int):
             transforms.ToTensor(),
             transforms.Resize([32, 32]),
             transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5)),
-            # transforms.RandomHorizontalFlip(),
-            # transforms.RandomRotation(10),
         ]
     )
 

@@ -49,9 +49,6 @@ class MyDataset(Dataset):
     def __getitem__(self, idx):
         return self.images[idx], self.labels[idx]
 
-
-
-
 # my own version of dataset loading
 train_dataset = MyDataset(True, 'data/processed')
 print(len(train_dataset))
@@ -71,6 +68,7 @@ wandb.watch(model, log_freq=100)
 # Train the model
 losses = []
 steps = 0
+accu = 0
 for epoch in range(num_epochs):
     print(f"epoch: {epoch+1}/{num_epochs}")
     running_loss = 0
@@ -92,6 +90,9 @@ for epoch in range(num_epochs):
     wandb.log({"Test Acc": test_acc})
     print('Accuracy of the model on the train images: {} %'.format(train_acc))
     print('Accuracy of the model on the test images: {} %'.format(test_acc))
+    if accu < test_acc:
+        accu = test_acc
+        torch.save(model.state_dict(), 'models/trained_model_64img.pt')
 
 # Use the plot function to draw a line plot
 plt.plot(range(steps), losses)
@@ -103,4 +104,3 @@ plt.ylabel("Training Loss")
 
 # Save the plot
 plt.savefig("reports/figures/loss_64img.png")
-torch.save(model.state_dict(), 'models/trained_model_64img.pt')
