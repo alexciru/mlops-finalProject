@@ -51,7 +51,6 @@ class MyDataset(Dataset):
 
 
 
-
 # my own version of dataset loading
 train_dataset = MyDataset(True, 'data/processed')
 print(len(train_dataset))
@@ -75,6 +74,7 @@ for epoch in range(num_epochs):
     print(f"epoch: {epoch+1}/{num_epochs}")
     running_loss = 0
     for (inputs, labels) in tqdm(trainloader):
+        breakpoint()
         loss_, preds_ = model.training_step(inputs, labels)
         running_loss += loss_.item()
 

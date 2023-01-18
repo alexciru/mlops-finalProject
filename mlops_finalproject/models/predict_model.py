@@ -13,7 +13,35 @@ from torchvision import transforms
 from mlops_finalproject.models import model
 from pytorch_lightning import Callback, Trainer
 from torchvision import transforms, datasets
+from torch.utils.data import Dataset
+import os
 
+
+class MyTestDataset(Dataset):
+    def __init__(self, train, path):
+        
+        self.images_path = os.path.join(path, "test", "images.pt")
+        self.labels_path = os.path.join(path, "test", "labels.pt")
+
+        # if train:
+        #     self.images_path = os.path.join(path, "train", "images.pt")
+        #     self.labels_path = os.path.join(path, "train", "labels.pt")
+        
+        # elif 
+
+        # else:
+        #     self.images_path = os.path.join(path, "test", "images.pt")
+        #     self.labels_path = os.path.join(path, "test", "labels.pt")
+
+        self.images = torch.load(self.images_path)
+        self.labels = torch.load(self.labels_path)
+        self.labels = self.labels.type(torch.LongTensor)
+
+    def __len__(self):
+        return len(self.images)
+
+    def __getitem__(self, idx):
+        return self.images[idx], self.labels[idx]
 
 
 def normalize_data(data):
@@ -28,21 +56,21 @@ def normalize_data(data):
 
     return data
 
+
 def get_data(path: str) -> list:
-    """ Funtion to load the folders with the imgs to predict
-    """
-    test = pd.read_csv(path + '/Test.csv')
+    """Funtion to load the folders with the imgs to predict"""
+    test = pd.read_csv(path + "/Test.csv")
     paths = test["Path"].values
     test_labels = test["ClassId"].values
 
     test_imgs = []
     transform = transforms.Compose(
         [
-        transforms.Resize([32, 32]),
-        #transforms.RandomHorizontalFlip(),
-        #transforms.RandomRotation(10),
-        transforms.ToTensor(),
-        #transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5))
+            transforms.Resize([32, 32]),
+            # transforms.RandomHorizontalFlip(),
+            # transforms.RandomRotation(10),
+            transforms.ToTensor(),
+            # transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5))
         ]
     )
 
@@ -50,7 +78,7 @@ def get_data(path: str) -> list:
         fullpath = path + "/" + img_path
         img = Image.open(fullpath)
 
-        tensor = transform(img) # Resize and convert to tensor
+        tensor = transform(img)  # Resize and convert to tensor
         test_imgs.append(tensor)
 
     output = [
@@ -62,11 +90,25 @@ def get_data(path: str) -> list:
     return output
 
 
+class ImageDataset(torch.utils.data.Dataset):
+    def __init__(self, data, transform=None):
+        self.data = data
+        self.transform = transform
+
+    def __len__(self):
+        return len(self.data)
+
+    def __getitem__(self, index):
+        image_path, image_label = self.data[index]
+        image = Image.open(image_path)
+        if self.transform:
+            image = self.transform(image)
+        return image, image_label
+
 @click.command()
 @click.argument("model_checkpoint", type=click.Path(exists=True))
-# @click.argument("data_path", type=click.Path(exists=True))
-@click.option("-n", "--num-images", required=False, type=int)
-def main(model_checkpoint, num_images: int):
+@click.argument("data_path", type=click.Path(exists=True))
+def main(model_checkpoint, data_path):
     """
     Runs data processing scripts to turn raw data from (../raw) into
     cleaned data ready to be analyzed (saved in ../processed).
@@ -76,27 +118,36 @@ def main(model_checkpoint, num_images: int):
     logger.info("Using model in inference")
     print(model_checkpoint)
 
-    mymodel = model.MobileNetV3Lightning()
+    mymodel = model.MobileNetV3Lightning(num_classes=43)
     mymodel.load_state_dict(torch.load(model_checkpoint))
 
-    images, labels = get_data("data/raw/German")
-    # images = normalize_data(images)
-    # breakpoint()
+    # test loader
+    # transform = transforms.Compose([transforms.ToTensor()])
+    transform = transforms.Compose(
+        [
+            transforms.ToTensor(),
+            transforms.Resize([32, 32]),
+            transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5)),
+            # transforms.RandomHorizontalFlip(),
+            # transforms.RandomRotation(10),
+        ]
+    )
+    images = []
+    for element in os.listdir(data_path):
+        img = Image.open(f"{data_path}/{element}")
+        img = transform(img).unsqueeze(0)
+        images.append(img)
+        # print(element)
 
-    test_dataset = TensorDataset(images, torch.from_numpy(labels))  # create your datset
-    testloader = DataLoader(
-        test_dataset, batch_size=64, num_workers=8
-    )  # create your dataloader
+    images_tensor = torch.stack(images)
+    fake_labels = [i for i in range(images_tensor.shape[0])]
 
-
-    images = torch.load("data/processed/images.pt")
-    labels = torch.load("data/processed/labels.pt")
-    traindataset = TensorDataset(images, labels)
-    trainloader = DataLoader(traindataset, batch_size=64, shuffle=False, num_workers=8)
+    dataset = TensorDataset(images_tensor, torch.tensor(fake_labels))
+    dataloader = DataLoader(dataset, batch_size=1, shuffle=False)
 
     trainer = Trainer()
-    trainer.test(mymodel, trainloader)
-
+    prediction = trainer.predict(mymodel, dataloaders=dataloader)
+    print(f"Prediction: {prediction}")
 
 
 if __name__ == "__main__":
