@@ -115,8 +115,6 @@ name = f"trained_model_32img_{timestamp}.pt"
 torch.save(model.state_dict(), 'models/' + name)
 
 
-
-
 # Save to google storage
 storage_client = storage.Client()
 buckets = list(storage_client.list_buckets())
