@@ -47,6 +47,11 @@ Execute with
 
 `docker run -e WANDB_API_KEY=<wandb_api_key> trainer_project:latest`
 
+
+# Inference Pytorchserve
+
+`docker build -f inference.dockerfile --tag=europe-west1-docker.pkg.dev/mlops-finalproject/inference-mnet/serve-mnet .`
+
 ### Predict
 Not yet implemented
 
