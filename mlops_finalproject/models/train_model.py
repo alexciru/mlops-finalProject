@@ -10,12 +10,11 @@ import random
 import os
 from tqdm import tqdm
 from google.cloud import storage
-import os
 from datetime import datetime
-
+import pickle
 
 #Hyperparameters
-num_epochs = 1
+num_epochs = 0
 learning_rate = 0.01        
 
 wandb.init(
@@ -115,11 +114,18 @@ name = f"trained_model_32img_{timestamp}.pt"
 
 torch.save(model.state_dict(), 'models/' + name)
 
+# save model
+
+name = f'models/model_{timestamp}.pkl'
+file = open(name, 'wb')
+pickle.dump(model, file)
+file.close()
 
 # Save to google storage
 storage_client = storage.Client()
-buckets = list(storage_client.list_buckets())
 bucket = storage_client.get_bucket("training-bucket-mlops") 
-blob = bucket.blob("weights/" + name)
-blob.upload_from_filename('models/' + name )
+blob = bucket.blob(name)
+blob.upload_from_filename(name)
 print(f"Succesfully push the weights {name} into: {bucket}")
+
+
