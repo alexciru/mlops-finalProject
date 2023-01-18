@@ -1,7 +1,7 @@
 import torch.nn as nn
 from torch import nn, optim
 import pytorch_lightning as pl
-import torchvision.models as models
+import timm
 import torch
 import torch.nn.functional as F
 from tqdm import tqdm
@@ -10,11 +10,11 @@ import pytest
 def build_model(pretrained=True, fine_tune=True, num_classes=43):
     if pretrained:
         print('[INFO]: Loading pre-trained weights')
-        model = models.mobilenet_v3_small(weights=models.MobileNet_V3_Small_Weights.DEFAULT)
+        model = timm.create_model('mobilenetv3_small_100', pretrained=True)
     else:
         print('[INFO]: Not loading pre-trained weights')
-        model = models.mobilenet_v3_small()
-        # model = models.mobilenet_v3_small(weights=models.MobileNet_V3_Large_Weights.DEFAULT)
+        #model = models.mobilenet_v3_small()
+        model = timm.create_model('mobilenetv3_small_100', pretrained=False)
     
     if fine_tune:
         print('[INFO]: Fine-tuning all layers...')
@@ -26,15 +26,16 @@ def build_model(pretrained=True, fine_tune=True, num_classes=43):
             params.requires_grad = False
 
     # Change the final classification head.
-    num_ftrs = model.classifier[-1].in_features
-    model.classifier[-1] = nn.Linear(in_features=num_ftrs, out_features=num_classes)
-
+    # Get the number of input features for the last layer
+    num_ftrs = model.classifier.in_features
+    # Replace the last layer with a new linear layer of size 43
+    model.classifier = nn.Linear(in_features=num_ftrs, out_features=num_classes)
     return model
 
 
 class MobileNetV3Lightning(pl.LightningModule):
     def __init__(self, num_classes=43, pretained=False):
-        super().__init__()
+        super(MobileNetV3Lightning, self).__init__()
         self.model = build_model()
         self.optimizer = optim.Adam(self.model.parameters(), lr=0.01)#, weight_decay=0.1)
         self.criterion = nn.CrossEntropyLoss()
