@@ -231,7 +231,7 @@ man_pages = [
 texinfo_documents = [
     ('index', 'mlops-finalProject', u'mlops-finalProject Documentation',
      u"team23", 'mlops-finalProject',
-     'Final project of DTU's course mlops', 'Miscellaneous'),
+     'Final project of DTUs course mlops', 'Miscellaneous'),
 ]
 
 # Documents to append as an appendix to all manuals.

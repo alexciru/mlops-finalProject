@@ -47,9 +47,9 @@ be installed with `pip install click markdown`.
 ### Question 1
 > **Enter the group number you signed up on <learn.inside.dtu.dk>**
 >
-> Answer: Group 23
+> Answer: 
 
---- question 1 fill here ---
+Group 23
 
 ### Question 2
 > **Enter the study number for each member in the group**
@@ -107,7 +107,11 @@ be installed with `pip install click markdown`.
 > *experiments.*
 > Answer:
 
---- question 5 fill here ---
+For the project we used the cookiecutter data science project template. Where each of the folders had a specifict porpuse. 
+The `data` folder is where the data is stored with different subfolders for the original data, the intermediated folder and for the final data used for the model. The `doc` folder is where the documentation is stored. The `model` folder is where all the info related to model such as checkpoints and predictions. `Notebooks` is used to store the jupyters that where used during development.`references` is used to stored manuals. `reports` is where the html and reports are generated.`src` is where all the source files are. These are divided into subfolders depending of the porpuse of the files.
+
+TODO: 
+We did not used all the folders and deleted XXX and XXX directories.
 
 ### Question 6
 
@@ -118,8 +122,7 @@ be installed with `pip install click markdown`.
 >
 > Answer:
 
---- question 6 fill here ---
-
+We implemented pep8 guidelines in order to standarize the code style and flake and black libraries to check and adapt to this guidelines.Is important to use style guidelines, specially in big projects whith different developers in order to accomplish consistency in the project making it easier to read and to understand differents parts of the code.
 ## Version control
 
 > In the following section we are interested in how version control was used in your project during development to
@@ -131,7 +134,8 @@ be installed with `pip install click markdown`.
 >
 > Answer:
 
---- question 7 fill here ---
+TODO: NUMBER OF EXACT TEST
+We implemented unit test in order to check the both how the data is used to createdd the dataset and the model implementation.
 
 ### Question 8
 
@@ -146,7 +150,8 @@ be installed with `pip install click markdown`.
 >
 > Answer:
 
---- question 8 fill here ---
+TODO: total coverage
+The total code coverage is X%. Despite being close to 100% does not mean that the code is error free. The coverage only determines the % of the lines of code that are being executed in the test. But this not covers diferenents inputs in functions or edge cases making the test a nice way to test part of the code but neede to implement diferent scenarios to test all kinds of possible errors.
 
 ### Question 9
 
@@ -161,7 +166,7 @@ be installed with `pip install click markdown`.
 >
 > Answer:
 
---- question 9 fill here ---
+We used both branches and pull requests in our project. In our group , every time we needed to implement a feature we created a new brach based on the main branch. Once the implementation was finished and the unit testing passing then we proceed to push the code into Github and created a pull request. This pull request was then accepted (if possible by another member) and then merge into the main branch. This helped us stay organices and divide the work into different and independent features.
 
 ### Question 10
 
@@ -176,7 +181,8 @@ be installed with `pip install click markdown`.
 >
 > Answer:
 
---- question 10 fill here ---
+We used DVC initially with the integration with google drive but we quickcly move on into DVC integrated in a bucket storage.
+At the beginning of the project it helped us to haev the initially dataset and to shared diferent versions of the processed dataset that was being used in different experients (like images with diferent sizes). It was very usefull to ensure that every team member had the same data during the development of the project.
 
 ### Question 11
 
@@ -192,7 +198,13 @@ be installed with `pip install click markdown`.
 >
 > Answer:
 
---- question 11 fill here ---
+TODO: add more
+We created diferent workflows to have CI in our project. Initially we created a test workflow to check if the code that was being pushed could pass the unit testing to protect the main branch. Also the isort workflow was added to sort the imports alphabetially and ensure consistency in the project.
+
+
+Pre-commit
+generate docker img ??
+
 
 ## Running code and tracking experiments
 

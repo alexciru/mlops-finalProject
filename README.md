@@ -23,8 +23,23 @@ The German Traffic Sign Recognition Benchmark (GTSRB) is a multi-class image cla
 
 What deep learning models do you expect to use? We expect to use MobileNetV3, which is a convolutional neural network (CNN) architecture primarily designed for efficient and accurate image recognition on mobile devices. It uses depthwise separable convolutions, inverted residuals, linear bottlenecks, and mobile blocks to reduce the computational complexity of the network and improve efficiency.
 
+# Make dataset
+Optional `-n` argument to process only specified amount of images
 
+`python mlops_finalproject/data/make_dataset.py  data/raw/German/Train  data/processed/ -n 300`
 
+# Docker
+## Trainer
+Build Docker with
+
+`docker build -f trainer.dockerfile . -t trainer_project:latest`
+
+Execute with
+
+`docker run -e WANDB_API_KEY=<wandb_api_key> trainer_project:latest`
+
+### Predict
+Not yet implemented
 
 ------------
 

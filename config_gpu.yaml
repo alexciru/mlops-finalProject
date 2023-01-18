@@ -1,0 +1,12 @@
+# config_gpu.yaml
+workerPoolSpecs:
+   machineSpec:
+      machineType: n1-standard-8
+      acceleratorType: NVIDIA_TESLA_T4
+      acceleratorCount: 1
+   replicaCount: 1
+   containerSpec:
+      imageUri: gcr.io/mlops-finalproject/trainer
+      env:
+         - name: WANDB_API_KEY
+           value: eecad361deb7502a7ed9a7c225c73d5fd2e93381

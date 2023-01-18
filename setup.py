@@ -4,7 +4,7 @@ setup(
     name='mlops_finalproject',
     packages=find_packages(),
     version='0.1.0',
-    description='Final project of DTU's course mlops',
+    description='Final project of DTUs course mlops',
     author='team23',
     license='',
 )
