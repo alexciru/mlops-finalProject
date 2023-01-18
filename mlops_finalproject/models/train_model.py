@@ -49,9 +49,6 @@ class MyDataset(Dataset):
     def __getitem__(self, idx):
         return self.images[idx], self.labels[idx]
 
-
-
-
 # my own version of dataset loading
 train_dataset = MyDataset(True, 'data/processed')
 print(len(train_dataset))

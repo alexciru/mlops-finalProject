@@ -5,6 +5,7 @@ import torchvision.models as models
 import torch
 import torch.nn.functional as F
 from tqdm import tqdm
+import pytest
 
 def build_model(pretrained=True, fine_tune=True, num_classes=43):
     if pretrained:
@@ -13,7 +14,6 @@ def build_model(pretrained=True, fine_tune=True, num_classes=43):
     else:
         print('[INFO]: Not loading pre-trained weights')
         model = models.mobilenet_v3_small()
-        
         # model = models.mobilenet_v3_small(weights=models.MobileNet_V3_Large_Weights.DEFAULT)
     
     if fine_tune:
@@ -33,33 +33,34 @@ def build_model(pretrained=True, fine_tune=True, num_classes=43):
 
 
 class MobileNetV3Lightning(pl.LightningModule):
-    # criterion = nn.NLLLoss()
     def __init__(self, num_classes=43, pretained=False):
         super().__init__()
         self.model = build_model()
         self.optimizer = optim.Adam(self.model.parameters(), lr=0.01)#, weight_decay=0.1)
         self.criterion = nn.CrossEntropyLoss()
 
-
     def forward(self, x: torch.Tensor):
+        if x.ndim != 4:
+            raise ValueError('Expected input to a 4D tensor')
+        if x.shape[1] != 3:
+            raise ValueError('Expected 3 channels input')
+        if (x.shape[2] < 32 or x.shape[2] > 224):
+            raise ValueError('Expected input height between 32 and 224 pixels')
+        if (x.shape[3] < 32 or x.shape[3] > 224):
+            raise ValueError('Expected input width between 32 and 224 pixels')
         x = self.model(x)
-        #x = F.log_softmax(x, dim=1)
-        # breakpoint()
-
         return x
 
+    # Train the model
     def training_step(self, images, labels):
         self.model.train()
         self.optimizer.zero_grad()
-        # images = images.view(images.shape[0], -1)
         output = self.model(images)
         loss = self.criterion(output, labels)
         loss.backward()
         self.optimizer.step()
         self.log('train_loss', loss)
         preds = torch.argmax(F.log_softmax(output, dim=1), 1)
-        # train_running_correct += (preds == labels).sum().item()
-
         return loss, preds
 
     # Test the model
