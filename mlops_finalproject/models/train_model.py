@@ -9,10 +9,14 @@ import wandb
 import random
 import os
 from tqdm import tqdm
+from google.cloud import storage
+import os
+from datetime import datetime
+
 
 #Hyperparameters
-num_epochs = 10
-learning_rate = 0.001        
+num_epochs = 1
+learning_rate = 0.01        
 
 wandb.init(
     # set the wandb project where this run will be logged
@@ -102,5 +106,21 @@ plt.xlabel("Training Steps")
 plt.ylabel("Training Loss")
 
 # Save the plot
-plt.savefig("reports/figures/loss_64img.png")
-torch.save(model.state_dict(), 'models/trained_model_64img.pt')
+plt.savefig("reports/figures/loss_32img.png")
+
+# save weights locally
+timestamp = datetime.today().strftime('%Y%m%d_%H%M')
+name = f"trained_model_32img_{timestamp}.pt"
+
+torch.save(model.state_dict(), 'models/' + name)
+
+
+
+
+# Save to google storage
+storage_client = storage.Client()
+buckets = list(storage_client.list_buckets())
+bucket = storage_client.get_bucket("training-bucket-mlops") 
+blob = bucket.blob("weights/" + name)
+blob.upload_from_filename('models/' + name )
+print(f"Succesfully push the weights {name} into: {bucket}")
