@@ -1,7 +1,7 @@
 import torch.nn as nn
 from torch import nn, optim
 import pytorch_lightning as pl
-import torchvision.models as models
+import timm
 import torch
 import torch.nn.functional as F
 from tqdm import tqdm
@@ -40,20 +40,23 @@ def build_model(pretrained=True, fine_tune=True, num_classes=43):
 
 
 class MobileNetV3Lightning(pl.LightningModule):
-    # criterion = nn.NLLLoss()
     def __init__(self, num_classes=43, pretained=False):
-        super().__init__()
+        super(MobileNetV3Lightning, self).__init__()
         self.model = build_model()
         # self.optimizer = optim.Adam(self.model.parameters(), lr=0.01)#, weight_decay=0.1)
         self.criterion = nn.CrossEntropyLoss()
         self.accuracy = torchmetrics.Accuracy(task='multiclass', num_classes=num_classes)
 
-
     def forward(self, x: torch.Tensor):
+        if x.ndim != 4:
+            raise ValueError('Expected input to a 4D tensor')
+        if x.shape[1] != 3:
+            raise ValueError('Expected 3 channels input')
+        if (x.shape[2] < 32 or x.shape[2] > 224):
+            raise ValueError('Expected input height between 32 and 224 pixels')
+        if (x.shape[3] < 32 or x.shape[3] > 224):
+            raise ValueError('Expected input width between 32 and 224 pixels')
         x = self.model(x)
-        #x = F.log_softmax(x, dim=1)
-        # breakpoint()
-
         return x
 
     def configure_optimizers(self):
