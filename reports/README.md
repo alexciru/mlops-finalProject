@@ -92,7 +92,7 @@ Group 23
 >
 > Answer:
 
---- question 4 fill here ---
+During the development of our project, we were using Anaconda to manage our virtual environments. A new member of the team would need to create an environment with the same libraries to be able to work with our project. To create a .txt file with the necessary requirements one needs to run “conda create --name <env> --file requirements.txt”. It is also possible to create a .txt file with pip using the “pip freeze > requirements.txt” command. A new member to join our project would need to be added to the Google Cloud, git repository, and wandb project using his email by one of the members.
 
 ### Question 5
 
@@ -107,8 +107,7 @@ Group 23
 > *experiments.*
 > Answer:
 
-For the project we used the cookiecutter data science project template. Where each of the folders had a specifict porpuse. 
-The `data` folder is where the data is stored with different subfolders for the original data, the intermediated folder and for the final data used for the model. The `doc` folder is where the documentation is stored. The `model` folder is where all the info related to model such as checkpoints and predictions. `Notebooks` is used to store the jupyters that where used during development.`references` is used to stored manuals. `reports` is where the html and reports are generated.`src` is where all the source files are. These are divided into subfolders depending of the porpuse of the files.
+For the project, we used the cookiecutter data science project template. Where each of the folders had a specific purpose. The `data` folder is where the data is stored with different subfolders for the original data, the intermediated folder and the final data used for the model. Here we added a new folder to store the raw data from our dataset. The `doc` folder is where the documentation is stored. The `model` folder is where all the info related to the model such as checkpoints and predictions. `Notebooks` is used to store the Jupiters that were used during development, ` references` is used to store manuals, `reports` is where the Html and reports are generated, `src` is where all the source files are. These are divided into subfolders depending on the purpose of the files. We also added the tests folder where we store unit tests scripts
 
 TODO: 
 We did not used all the folders and deleted XXX and XXX directories.
@@ -122,7 +121,7 @@ We did not used all the folders and deleted XXX and XXX directories.
 >
 > Answer:
 
-We implemented pep8 guidelines in order to standarize the code style and flake and black libraries to check and adapt to this guidelines.Is important to use style guidelines, specially in big projects whith different developers in order to accomplish consistency in the project making it easier to read and to understand differents parts of the code.
+We implemented pep8 guidelines in order to standardise the code style and flake and black libraries to check and adapt to these guidelines. It is important to use style guidelines, especially in big projects with different developers to accomplish consistency in the project making it easier to read and to understand different parts of the code.
 ## Version control
 
 > In the following section we are interested in how version control was used in your project during development to
@@ -134,8 +133,7 @@ We implemented pep8 guidelines in order to standarize the code style and flake a
 >
 > Answer:
 
-TODO: NUMBER OF EXACT TEST
-We implemented unit test in order to check the both how the data is used to createdd the dataset and the model implementation.
+In our project, we have 2 tests to check if the model has been created correctly and 4 test to verify the correctness of the dataset. We implemented unittests to check if the loaded data has the correct size and later if all of the images in the used dataset have the correct shape. Our tests are also checking if every image has been loaded with a label. We implemented also 2 tests for the model, we are checking if the model’s output has the correct shape.
 
 ### Question 8
 
@@ -151,7 +149,7 @@ We implemented unit test in order to check the both how the data is used to crea
 > Answer:
 
 TODO: total coverage
-The total code coverage is X%. Despite being close to 100% does not mean that the code is error free. The coverage only determines the % of the lines of code that are being executed in the test. But this not covers diferenents inputs in functions or edge cases making the test a nice way to test part of the code but neede to implement diferent scenarios to test all kinds of possible errors.
+The total code coverage is X%. Despite being close to 100% does not mean that the code is error-free. The coverage only determines the % of the lines of code that are being executed in the test. But this does not cover different inputs in functions or edge cases making the test a nice way to test part of the code. 
 
 ### Question 9
 
@@ -181,8 +179,7 @@ In our project we used both branches and pull requests for software version cont
 >
 > Answer:
 
-We used DVC initially with the integration with google drive but we quickcly move on into DVC integrated in a bucket storage.
-At the beginning of the project it helped us to haev the initially dataset and to shared diferent versions of the processed dataset that was being used in different experients (like images with diferent sizes). It was very usefull to ensure that every team member had the same data during the development of the project.
+We used DVC initially with the integration with google drive but we quickly moved on to DVC integrated with bucket storage. During the project development, DVC enabled all members to get the original dataset using the terminal and DVC pull command without the struggle of extracting a huge file with 50000 images into the correct subdirectories inside the project. Later on, using DVC was very useful to ensure that all members were using data preprocessed in the same way. Using DVC also enables the storage of datasets that were preprocessed differently. With different datasets stored using DVC it was easier to test the model on different data.
 
 ### Question 11
 
@@ -326,7 +323,7 @@ generate docker img ??
 >
 > Answer:
 
---- question 19 fill here ---
+[GCP bucket](figures/gcp_bucket.png)
 
 ### Question 20
 
@@ -335,7 +332,7 @@ generate docker img ??
 >
 > Answer:
 
---- question 20 fill here ---
+[GCP container registry](figures/gcp_container_registry.jpg)
 
 ### Question 21
 
@@ -344,7 +341,7 @@ generate docker img ??
 >
 > Answer:
 
---- question 21 fill here ---
+[GCP cloud build history](figures/gcp_build_history.jpg)
 
 ### Question 22
 
@@ -360,7 +357,7 @@ generate docker img ??
 >
 > Answer:
 
---- question 22 fill here ---
+We managed to deploy the model in the GCP cloud. However, first, we trained the model locally and afterwards saved it and loaded it for the predictions, that were run locally. Once this was completed we moved to set up the model in the cloud. The workflow of the model deployment in the cloud can be described as follows: whenever a team member successfully pushes and merges code with the main branch in the GitHub repository a docker file is automatically created in the GCP cloud. Then with the latest docker image, we are training the model in the cloud using Vertex AI. Once the training has finished the .pck file is created and we deploy this model in the cloud and use it for future projections. 
 
 ### Question 23
 
