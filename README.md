@@ -106,7 +106,7 @@ cat > instances.json <<END
  "instances": [
    {
      "data": {
-       "b64": "$(base64 --wrap=0 data/raw/German/Test/00000.png)"
+       "b64": "$(base64 --wrap=0 data/raw/Polish/Test/0000.jpg)"
      }
    }
  ]
@@ -114,7 +114,7 @@ cat > instances.json <<END
 END
 
 curl -X POST \
-  -H "Authorization: Bearer ya29.a0AX9GBdWJ7k41rfUClwwdC2bIk2X6xH7uO424vmpLDIYGELz6N0RCklYjHte2RY_KQzmXz2axFWe5xwedhw9q3em1D2qr3vDyh594wT_vsuR6y0g9NZgUj3Eomi27wvAUIQ_efJX2VigPR-YXotXJYVEzbTlwsAwqUhcYMAaCgYKAckSAQASFQHUCsbC7fWILvr6oeFrKYXWsK-dLg0173" \
+  -H "Authorization: Bearer ya29.a0AX9GBdX0tMpwQ-5kQU3QwS-YIKKiIcPhdR1kmzibTofTR6WSolE_ZrmZ63S96oqD4X8Cq1DkOS6sEkEjbrjiTlE7isI6U44r-TxV--P5m1aI6yZpa_kvTkmTY1-TMPpA_gEJoqLjkgN7WGHELr53Rw01kKaGlo2wOWC76waCgYKAe0SAQASFQHUCsbCzsyp2hE7Hqz2dYHSJ79Cew0173" \
   -H "Content-Type: application/json; charset=utf-8" \
   -d @instances.json \
   https://europe-west1-ml.googleapis.com/v1/projects/mlops-finalproject/models/inference_mnet/versions/v2:predict
