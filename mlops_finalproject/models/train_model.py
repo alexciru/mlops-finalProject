@@ -15,10 +15,8 @@ from pytorch_lightning.loggers import WandbLogger
 from datetime import datetime
 from google.cloud import storage
 import pickle
-#Detect if the script is running in GCP
 import requests
 import platform
-#Hydra deploy 
 import hydra
 
 class MyDataset(Dataset):
@@ -62,11 +60,6 @@ class MetricTracker(Callback):
     def on_validation_epoch_end(self, trainer: "pl.Trainer", pl_module: "pl.LightningModule"):
         elogs = trainer.logged_metrics
         self.validation_accuracies.append(elogs["val_accuracy"])
-
-# wandb.init(
-#     # set the wandb project where this run will be logged
-#     project="mlops_finalProject",
-# )
 
 @hydra.main(config_path=os.path.join(os.getcwd(),'models/'), config_name='config.yaml')
 def main(cfg):
