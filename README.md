@@ -78,8 +78,48 @@ curl -X POST \
   localhost:8080/predictions/mnet
 ```
 
-### Predict
-Not yet implemented
+
+### deploy pytorch in cloud
+
+1. Create auth:  
+```
+gcloud auth configure-docker europe-west1-docker.pkg.dev
+```
+
+2. Push auth:
+```
+docker push europe-west1-docker.pkg.dev/mlops-finalproject/inference-mnet/serve-mnet
+```
+
+3. create plantform:
+```
+gcloud beta ai-platform models create servemnet --region=europe-west1  --enable-logging  --enable-console-logging
+```
+
+### Predict from cloud
+
+1. Prediction sent to the cloud:  
+```
+cat > instances.json <<END
+{
+ "instances": [
+   {
+     "data": {
+       "b64": "$(base64 --wrap=0 data/raw/German/Test/00000.png)"
+     }
+   }
+ ]
+}
+END
+
+curl -X POST \
+  -H "Authorization: Bearer ya29.a0AX9GBdWJ7k41rfUClwwdC2bIk2X6xH7uO424vmpLDIYGELz6N0RCklYjHte2RY_KQzmXz2axFWe5xwedhw9q3em1D2qr3vDyh594wT_vsuR6y0g9NZgUj3Eomi27wvAUIQ_efJX2VigPR-YXotXJYVEzbTlwsAwqUhcYMAaCgYKAckSAQASFQHUCsbC7fWILvr6oeFrKYXWsK-dLg0173" \
+  -H "Content-Type: application/json; charset=utf-8" \
+  -d @instances.json \
+  https://europe-west1-ml.googleapis.com/v1/projects/mlops-finalproject/models/inference_mnet/versions/v2:predict
+```
+
+you should recieved a response from the server !!!!  
 
 ------------
 
@@ -142,10 +182,10 @@ Project Organization
 * [x] Create a dedicated environment for you project to keep track of your packages (using conda)
 * [x] Create the initial file structure using cookiecutter
 * [x] Fill out the `make_dataset.py` file such that it downloads whatever data you need and
-* [ ] Add a model file and a training script and get that running
-* [ ] Remember to fill out the `requirements.txt` file with whatever dependencies that you are using
+* [x] Add a model file and a training script and get that running
+* [x] Remember to fill out the `requirements.txt` file with whatever dependencies that you are using
 * [ ] Remember to comply with good coding practices (`pep8`) while doing the project
-* [ ] Do a bit of code typing and remember to document essential parts of your code
+* [x] Do a bit of code typing and remember to document essential parts of your code
 * [x] Setup version control for your data or part of your data
 * [ ] Construct one or multiple docker files for your code
 * [ ] Build the docker files locally and make sure they work as intended

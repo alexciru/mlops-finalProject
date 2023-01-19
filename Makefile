@@ -75,6 +75,20 @@ train_cloud_gpu:
 	gcloud ai custom-jobs create --region=europe-west1 --display-name=test-run --config=config_gpu.yaml
 
 # deploy pytorch server locally
+pytorch_server_building:
+	docker build -f inference.dockerfile --tag=europe-west1-docker.pkg.dev/mlops-finalproject/inference-mnet/serve-mnet .
+
+pytorch_server_run:
+	docker run -p 8080:8080 --name=local_mnet_inference99 europe-west1-docker.pkg.dev/mlops-finalproject/inference-mnet/serve-mnet
+
+
+
+# Create bucket and deploy
+deploy:
+	gcloud auth configure-docker europe-west1-docker.pkg.dev
+	docker push europe-west1-docker.pkg.dev/mlops-finalproject/inference-mnet/serve-mnet
+	gcloud beta ai-platform models create demo_mnet --region=europe-west1  --enable-logging  --enable-console-logging
+
 
 
 #################################################################################
