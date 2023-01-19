@@ -437,5 +437,6 @@ During the development of the project, we come across many bugs and problems. On
 >
 > Answer:
 
+Member s222999 contributed to the preprocessing of data so that they can be used to train the model, writing and validating the model_train.py and predict_model.py scripts, writing unittest, and profiling of the code.
 Student s222914 was in charge of organizing the initial setup the working enviroment (Github, W&B, GCP, DVC ...), worked in the CI with github actions and workied on the deployment in the cloud of training and prediction. 
 Student s2182105 implemented the training and predict with py-lightning, deployed the torchserver locally and helped with the deploy of the prediction in the cloud.
