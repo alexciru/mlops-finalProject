@@ -11,6 +11,8 @@ python-dotenv==0.21.0
 setuptools==65.6.3
 timm==0.6.12
 wandb==0.13.9
+pytorch-lightning==1.8.6
+google-cloud-storage==2.7.0
 tqdm
 -e .
 flake8

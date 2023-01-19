@@ -28,6 +28,15 @@ Optional `-n` argument to process only specified amount of images
 
 `python mlops_finalproject/data/make_dataset.py  data/raw/German/Train  data/processed/ -n 300`
 
+
+# Predict in inference
+
+It needs
+- Argument for the model checkpoint
+- Argument with a directory with only images
+
+`python mlops_finalproject/models/predict_model.py models/trained_model_timm_lightning.pt data/raw/German/Test/`
+
 # Docker
 ## Trainer
 Build Docker with
@@ -37,6 +46,37 @@ Build Docker with
 Execute with
 
 `docker run -e WANDB_API_KEY=<wandb_api_key> trainer_project:latest`
+
+
+# Inference Pytorchserve
+1. Build docker
+
+`docker build -f inference.dockerfile --tag=europe-west1-docker.pkg.dev/mlops-finalproject/inference-mnet/serve-mnet .`
+
+2. Execute docker
+
+` docker run -p 8080:8080 --name=local_mnet_inference99 europe-west1-docker.pkg.dev/mlops-finalproject/inference-mnet/serve-mnist`
+
+3. Send to get prediction (copy that to terminal)
+
+```
+cat > instances.json <<END
+{
+  "instances": [
+    {
+      "data": {
+        "b64": "b64": "$(base64 --wrap=0 data/raw/German/Test/00000.png)"
+      }
+    }
+  ]
+}
+END
+
+curl -X POST \
+  -H "Content-Type: application/json; charset=utf-8" \
+  -d @instances.json \
+  localhost:8080/predictions/mnist
+```
 
 ### Predict
 Not yet implemented

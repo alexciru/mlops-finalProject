@@ -13,60 +13,16 @@ from torchvision import transforms
 from mlops_finalproject.models import model
 from pytorch_lightning import Callback, Trainer
 from torchvision import transforms, datasets
-
-
-
-def normalize_data(data):
-    # Normalize
-    for idx, image in enumerate(data):
-        mean = image.mean().item()
-        std = image.std().item()
-
-        transform_norm = transforms.Compose([transforms.Normalize(mean, std)])
-        img_normalized = transform_norm(image)
-        data[idx] = img_normalized
-
-    return data
-
-def get_data(path: str) -> list:
-    """ Funtion to load the folders with the imgs to predict
-    """
-    test = pd.read_csv(path + '/Test.csv')
-    paths = test["Path"].values
-    test_labels = test["ClassId"].values
-
-    test_imgs = []
-    transform = transforms.Compose(
-        [
-        transforms.Resize([32, 32]),
-        #transforms.RandomHorizontalFlip(),
-        #transforms.RandomRotation(10),
-        transforms.ToTensor(),
-        #transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5))
-        ]
-    )
-
-    for img_path in paths:
-        fullpath = path + "/" + img_path
-        img = Image.open(fullpath)
-
-        tensor = transform(img) # Resize and convert to tensor
-        test_imgs.append(tensor)
-
-    output = [
-        torch.stack(test_imgs),
-        test_labels,
-    ]
-    # breakpoint()
-
-    return output
-
+from torch.utils.data import Dataset
+import os
+from google.cloud import storage
+import pickle
+import io
 
 @click.command()
-@click.argument("model_checkpoint", type=click.Path(exists=True))
-# @click.argument("data_path", type=click.Path(exists=True))
-@click.option("-n", "--num-images", required=False, type=int)
-def main(model_checkpoint, num_images: int):
+@click.argument("model_checkpoint")
+@click.argument("data_path", type=click.Path(exists=True))
+def main(model_checkpoint, data_path):
     """
     Runs data processing scripts to turn raw data from (../raw) into
     cleaned data ready to be analyzed (saved in ../processed).
@@ -74,29 +30,61 @@ def main(model_checkpoint, num_images: int):
 
     logger = logging.getLogger(__name__)
     logger.info("Using model in inference")
-    print(model_checkpoint)
 
-    mymodel = model.MobileNetV3Lightning()
-    mymodel.load_state_dict(torch.load(model_checkpoint))
+    BUCKET_NAME =  "training-bucket-mlops"
+    MODEL_FILE = model_checkpoint
+    print(MODEL_FILE)
 
-    images, labels = get_data("data/raw/German")
-    # images = normalize_data(images)
+    client = storage.Client()
+    bucket = client.get_bucket(BUCKET_NAME)
+
+    blob = bucket.get_blob(MODEL_FILE)
+    # weights_pt = blob.download_to_filename("models/weights_1.pt")
+    weights_pt = blob.download_as_bytes()
+    # model = MobileNetV3Lightning(num_classes=43)
+
+    # # mymodel = pickle.loads()
+    # model = load_state_dict(torch.load(model_checkpoint))
+    # print(mymodel)
+    buffer = io.BytesIO()
+    buffer.write(weights_pt)
+    buffer.seek(0)
+
+    mymodel = model.MobileNetV3Lightning(num_classes=43)
+    mymodel.load_state_dict(torch.load(buffer))
+
+    # test loader
+    transform = transforms.Compose(
+        [
+            transforms.ToTensor(),
+            transforms.Resize([32, 32]),
+            transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5)),
+        ]
+    )
+
+    max_images = 300
+    ir = 0
+    images = []
+    for element in os.listdir(data_path):
+        img = Image.open(f"{data_path}/{element}")
+        img = transform(img).unsqueeze(0)
+        images.append(img)
+        # print(element)
+        ir += 1
+        if ir >= max_images:
+            break
+
+    images_tensor = torch.stack(images)
+    images_tensor = images_tensor.view(images_tensor.shape[0],3,32,32)
+    fake_labels = [i for i in range(images_tensor.shape[0])]
     # breakpoint()
-
-    test_dataset = TensorDataset(images, torch.from_numpy(labels))  # create your datset
-    testloader = DataLoader(
-        test_dataset, batch_size=64, num_workers=8
-    )  # create your dataloader
-
-
-    images = torch.load("data/processed/images.pt")
-    labels = torch.load("data/processed/labels.pt")
-    traindataset = TensorDataset(images, labels)
-    trainloader = DataLoader(traindataset, batch_size=64, shuffle=False, num_workers=8)
+    dataset = TensorDataset(images_tensor, torch.tensor(fake_labels))
+    dataloader = DataLoader(dataset, batch_size=1, shuffle=False)
 
     trainer = Trainer()
-    trainer.test(mymodel, trainloader)
-
+    preds = trainer.predict(mymodel, dataloaders=dataloader)
+    predictions = [p.item() for p in preds]
+    print(f"Prediction: {predictions}")
 
 
 if __name__ == "__main__":

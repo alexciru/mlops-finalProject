@@ -59,6 +59,17 @@ create_environment:
 data: requirements
 	$(PYTHON_INTERPRETER) mlops_finalproject/data/make_dataset.py  data/raw/German/  data/processed/
 
+
+
+train: 
+	$(PYTHON_INTERPRETER) mlops_finalproject/models/train_model.py
+
+train_cloud_cpu: 
+	gcloud ai custom-jobs create --region=europe-west1 --display-name=test-run --config=config_cpu.yaml
+
+train_cloud_gpu: 
+	gcloud ai custom-jobs create --region=europe-west1 --display-name=test-run --config=config_gpu.yaml
+
 #################################################################################
 # Self Documenting Commands                                                     #
 #################################################################################
