@@ -119,7 +119,8 @@ For the project, we used the cookiecutter data science project template. Where e
 >
 > Answer:
 
-We implemented pep8 guidelines in order to standardise the code style and flake and black libraries to check and adapt to these guidelines. It is important to use style guidelines, especially in big projects with different developers to accomplish consistency in the project making it easier to read and to understand different parts of the code.
+We implemented pep8 guidelines in order to standardise the code style and flake and black libraries to check and adapt to these guidelines. It is important to use style guidelines, especially in big projects with different developers to accomplish consistency in the project making it easier to read, understand and to maintain.
+
 ## Version control
 
 > In the following section we are interested in how version control was used in your project during development to
