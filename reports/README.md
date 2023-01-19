@@ -119,7 +119,8 @@ For the project, we used the cookiecutter data science project template. Where e
 >
 > Answer:
 
-We implemented pep8 guidelines in order to standardise the code style and flake and black libraries to check and adapt to these guidelines. It is important to use style guidelines, especially in big projects with different developers to accomplish consistency in the project making it easier to read and to understand different parts of the code.
+We implemented pep8 guidelines in order to standardise the code style and flake and black libraries to check and adapt to these guidelines. It is important to use style guidelines, especially in big projects with different developers to accomplish consistency in the project making it easier to read, understand and to maintain.
+
 ## Version control
 
 > In the following section we are interested in how version control was used in your project during development to
@@ -311,7 +312,7 @@ In our project, we use the buckets of GCP for multiple things: first, we store t
 >
 > Answer:
 
---- question 18 fill here ---
+ The main use of Computer engine was to use then as test enviroments to test the docker images before being deployed in the google services Vertex AI and Platform AI. We used n1-standard-1 that used Intel Haswell as CPU platforms. Some experiments where conducted in computer engines with GPUs without success.
 
 ### Question 19
 
@@ -437,3 +438,6 @@ During the development of the project, we come across many bugs and problems. On
 >
 > Answer:
 
+Member s222999 contributed to the preprocessing of data so that they can be used to train the model, writing and validating the model_train.py and predict_model.py scripts, writing unittest, and profiling of the code.
+Student s222914 was in charge of organizing the initial setup the working enviroment (Github, W&B, GCP, DVC ...), worked in the CI with github actions and workied on the deployment in the cloud of training and prediction. 
+Student s2182105 implemented the training and predict with py-lightning, deployed the torchserver locally and helped with the deploy of the prediction in the cloud.
