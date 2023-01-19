@@ -16,17 +16,17 @@ class MobileNetV3Lightning(pl.LightningModule):
         self.model = self.build_model()
         # self.optimizer = optim.Adam(self.model.parameters(), lr=0.01)#, weight_decay=0.1)
         self.criterion = nn.CrossEntropyLoss()
-        self.accuracy = torchmetrics.Accuracy(task='multiclass', num_classes=num_classes)
+        self.accuracy = torchmetrics.Accuracy(task="multiclass", num_classes=num_classes)
 
     def forward(self, x: torch.Tensor):
         if x.ndim != 4:
-            raise ValueError('Expected input to a 4D tensor')
+            raise ValueError("Expected input to a 4D tensor")
         if x.shape[1] != 3:
-            raise ValueError('Expected 3 channels input')
-        if (x.shape[2] < 32 or x.shape[2] > 224):
-            raise ValueError('Expected input height between 32 and 224 pixels')
-        if (x.shape[3] < 32 or x.shape[3] > 224):
-            raise ValueError('Expected input width between 32 and 224 pixels')
+            raise ValueError("Expected 3 channels input")
+        if x.shape[2] < 32 or x.shape[2] > 224:
+            raise ValueError("Expected input height between 32 and 224 pixels")
+        if x.shape[3] < 32 or x.shape[3] > 224:
+            raise ValueError("Expected input width between 32 and 224 pixels")
         x = self.model(x)
         return x
 
@@ -47,7 +47,7 @@ class MobileNetV3Lightning(pl.LightningModule):
         # self.optimizer.step()
         preds = torch.argmax(F.log_softmax(output, dim=1), 1)
         # train_running_correct += (preds == labels).sum().item()
-        self.log('train_loss', loss)
+        self.log("train_loss", loss)
 
         return loss
 
@@ -65,9 +65,8 @@ class MobileNetV3Lightning(pl.LightningModule):
         return acc
         # correct += predicted.eq(labels.data).cpu().sum()
 
-
     def validation_epoch_end(self, validation_step_outputs):
-        self.log("val_accuracy", np.mean(validation_step_outputs)*100)
+        self.log("val_accuracy", np.mean(validation_step_outputs) * 100)
 
     def predict_step(self, batch, batch_idx, dataloader_idx: int = 0):
         imgs, label = batch
@@ -77,25 +76,24 @@ class MobileNetV3Lightning(pl.LightningModule):
 
         return predicted
 
-        
     def build_model(pretrained=True, fine_tune=True, num_classes=43):
         if pretrained:
-            print('[INFO]: Loading pre-trained weights')
+            print("[INFO]: Loading pre-trained weights")
             # model = models.mobilenet_v3_small(weights=models.MobileNet_V3_Small_Weights.DEFAULT)
-            model = timm.create_model('mobilenetv3_small_100', pretrained=True)
+            model = timm.create_model("mobilenetv3_small_100", pretrained=True)
         else:
-            print('[INFO]: Not loading pre-trained weights')
+            print("[INFO]: Not loading pre-trained weights")
             # model = models.mobilenet_v3_small()
-            model = timm.create_model('mobilenetv3_small_100', pretrained=False)
-            
+            model = timm.create_model("mobilenetv3_small_100", pretrained=False)
+
             # model = models.mobilenet_v3_small(weights=models.MobileNet_V3_Large_Weights.DEFAULT)
-        
+
         if fine_tune:
-            print('[INFO]: Fine-tuning all layers...')
+            print("[INFO]: Fine-tuning all layers...")
             for params in model.parameters():
                 params.requires_grad = True
         elif not fine_tune:
-            print('[INFO]: Freezing hidden layers...')
+            print("[INFO]: Freezing hidden layers...")
             for params in model.parameters():
                 params.requires_grad = False
 

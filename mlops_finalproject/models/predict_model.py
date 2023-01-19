@@ -19,6 +19,7 @@ from google.cloud import storage
 import pickle
 import io
 
+
 @click.command()
 @click.argument("model_checkpoint")
 @click.argument("data_path", type=click.Path(exists=True))
@@ -31,7 +32,7 @@ def main(model_checkpoint, data_path):
     logger = logging.getLogger(__name__)
     logger.info("Using model in inference")
 
-    BUCKET_NAME =  "training-bucket-mlops"
+    BUCKET_NAME = "training-bucket-mlops"
     MODEL_FILE = model_checkpoint
     print(MODEL_FILE)
 
@@ -75,7 +76,7 @@ def main(model_checkpoint, data_path):
             break
 
     images_tensor = torch.stack(images)
-    images_tensor = images_tensor.view(images_tensor.shape[0],3,32,32)
+    images_tensor = images_tensor.view(images_tensor.shape[0], 3, 32, 32)
     fake_labels = [i for i in range(images_tensor.shape[0])]
     # breakpoint()
     dataset = TensorDataset(images_tensor, torch.tensor(fake_labels))

@@ -10,11 +10,13 @@ class MNETTrafficClassifier(ImageClassifier):
     Here method postprocess() has been overridden while others are reused from parent class.
     """
 
-    image_processing = transforms.Compose([
-        transforms.ToTensor(),
-        transforms.Resize([32, 32]),
-        transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5)),
-    ])
+    image_processing = transforms.Compose(
+        [
+            transforms.ToTensor(),
+            transforms.Resize([32, 32]),
+            transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5)),
+        ]
+    )
 
     def postprocess(self, data):
         """The post process of MNIST converts the predicted output response to a label.
