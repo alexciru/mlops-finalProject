@@ -11,12 +11,13 @@ import timm
 
 
 class MobileNetV3Lightning(pl.LightningModule):
-    def __init__(self, num_classes=43, pretained=False):
+    def __init__(self, learn_rate, num_classes=43, pretained=False):
         super(MobileNetV3Lightning, self).__init__()
         self.model = self.build_model()
         # self.optimizer = optim.Adam(self.model.parameters(), lr=0.01)#, weight_decay=0.1)
         self.criterion = nn.CrossEntropyLoss()
         self.accuracy = torchmetrics.Accuracy(task='multiclass', num_classes=num_classes)
+        self.learn_rate = learn_rate
 
     def forward(self, x: torch.Tensor):
         if x.ndim != 4:
@@ -31,7 +32,7 @@ class MobileNetV3Lightning(pl.LightningModule):
         return x
 
     def configure_optimizers(self):
-        optimizer = optim.Adam(self.model.parameters(), lr=0.01)
+        optimizer = optim.Adam(self.model.parameters(), lr=self.learn_rate)
         return optimizer
 
     def training_step(self, batch, batch_idx):
@@ -81,15 +82,11 @@ class MobileNetV3Lightning(pl.LightningModule):
     def build_model(pretrained=True, fine_tune=True, num_classes=43):
         if pretrained:
             print('[INFO]: Loading pre-trained weights')
-            # model = models.mobilenet_v3_small(weights=models.MobileNet_V3_Small_Weights.DEFAULT)
             model = timm.create_model('mobilenetv3_small_100', pretrained=True)
         else:
             print('[INFO]: Not loading pre-trained weights')
-            # model = models.mobilenet_v3_small()
             model = timm.create_model('mobilenetv3_small_100', pretrained=False)
             
-            # model = models.mobilenet_v3_small(weights=models.MobileNet_V3_Large_Weights.DEFAULT)
-        
         if fine_tune:
             print('[INFO]: Fine-tuning all layers...')
             for params in model.parameters():
@@ -99,9 +96,6 @@ class MobileNetV3Lightning(pl.LightningModule):
             for params in model.parameters():
                 params.requires_grad = False
 
-        # Change the final classification head.
-        # num_ftrs = model.classifier[-1].in_features
-        # model.classifier[-1] = nn.Linear(in_features=num_ftrs, out_features=num_classes)
         num_ftrs = model.classifier.in_features
         model.classifier = nn.Linear(in_features=num_ftrs, out_features=num_classes)
 
