@@ -1,4 +1,4 @@
-name: "Run isort on project"
+name: "Run black on project"
 
 on:
   push:
