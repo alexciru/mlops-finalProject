@@ -18,18 +18,19 @@ import pickle
 #Detect if the script is running in GCP
 import requests
 import platform
-
+#Hydra deploy 
+import hydra
 
 class MyDataset(Dataset):
     def __init__(self, train, path):
 
         if train:
-            self.images_path = os.path.join(path, "train", "images.pt")
-            self.labels_path = os.path.join(path, "train", "labels.pt")
+            self.images_path = os.path.join(path,"data","processed","train","images.pt")
+            self.labels_path = os.path.join(path,"data","processed","train","labels.pt")
 
         else:
-            self.images_path = os.path.join(path, "test", "images.pt")
-            self.labels_path = os.path.join(path, "test", "labels.pt")
+            self.images_path = os.path.join(path,"data","processed","test","images.pt")
+            self.labels_path = os.path.join(path,"data","processed","test","labels.pt")
 
         self.images = torch.load(self.images_path)
         self.labels = torch.load(self.labels_path)
@@ -67,19 +68,36 @@ class MetricTracker(Callback):
 #     project="mlops_finalProject",
 # )
 
-def main(num_workers):
-    train_dataset = MyDataset(True, "data/processed")
-    trainloader = DataLoader(train_dataset, batch_size=64, shuffle=True, num_workers=num_workers)
+@hydra.main(config_path=os.path.join(os.getcwd(),'models/'), config_name='config.yaml')
+def main(cfg):
 
-    test_dataset = MyDataset(False, "data/processed")
-    testloader = DataLoader(test_dataset, batch_size=64, shuffle=False, num_workers=num_workers)
+    if check_gcp():
+        num_workers = 8
+        print("Training on cloud")
+    else:
+        num_workers = 0
+        print("Training on premises")
+
+    root_dir = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+
+    train_dataset = MyDataset(True, root_dir)
+    trainloader = DataLoader(train_dataset, batch_size=cfg.hyperparameters.batch_size, shuffle=True, num_workers=num_workers)
+
+    test_dataset = MyDataset(False, root_dir)
+    testloader = DataLoader(test_dataset, batch_size=cfg.hyperparameters.batch_size, shuffle=False, num_workers=num_workers)
 
     metrics = MetricTracker()
-    model = MobileNetV3Lightning(num_classes=43)
+    model = MobileNetV3Lightning(learn_rate=cfg.hyperparameters.learning_rate, num_classes=43)
 
 
     trainer = Trainer(
-        max_epochs=9, callbacks=[metrics], logger=WandbLogger(project="mlops_finalProject")
+        max_epochs=9, callbacks=[metrics], logger=WandbLogger(name=hydra.utils.get_original_cwd(), project="mlops_finalProject", config={
+            "architecture": "CNN",
+            "dataset": "GTSRB",
+            "epochs": cfg.hyperparameters.num_epochs,
+            "batch size": cfg.hyperparameters.batch_size,
+            "learning_rate": cfg.hyperparameters.learning_rate,
+        })
     )
     wandb.watch(model, log_freq=100)
 
@@ -119,10 +137,4 @@ def main(num_workers):
     print(f"Succesfully push the weights {name} into: {bucket}")
 
 if __name__ == '__main__':
-    if check_gcp():
-        num_workers = 8
-        print("Training on cloud")
-    else:
-        num_workers = 0
-        print("Training on premises")
-    main(num_workers)
+    main()
