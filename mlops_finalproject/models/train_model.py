@@ -15,6 +15,9 @@ from pytorch_lightning.loggers import WandbLogger
 from datetime import datetime
 from google.cloud import storage
 import pickle
+#Detect if the script is running in GCP
+import requests
+import platform
 
 
 class MyDataset(Dataset):
@@ -38,6 +41,12 @@ class MyDataset(Dataset):
     def __getitem__(self, idx):
         return self.images[idx], self.labels[idx]
 
+def check_gcp():
+    try:
+        response = requests.get("http://metadata.google.internal/computeMetadata/v1/project/project-id", headers={'Metadata-Flavor': 'Google'})
+        return response.status_code == 200
+    except:
+        return False
 
 class MetricTracker(Callback):
     def __init__(self):
@@ -58,53 +67,62 @@ class MetricTracker(Callback):
 #     project="mlops_finalProject",
 # )
 
+def main(num_workers):
+    train_dataset = MyDataset(True, "data/processed")
+    trainloader = DataLoader(train_dataset, batch_size=64, shuffle=True, num_workers=num_workers)
 
-train_dataset = MyDataset(True, "data/processed")
-trainloader = DataLoader(train_dataset, batch_size=128, shuffle=True, num_workers=8)
+    test_dataset = MyDataset(False, "data/processed")
+    testloader = DataLoader(test_dataset, batch_size=64, shuffle=False, num_workers=num_workers)
 
-test_dataset = MyDataset(False, "data/processed")
-testloader = DataLoader(test_dataset, batch_size=128, shuffle=False, num_workers=8)
-
-metrics = MetricTracker()
-model = MobileNetV3Lightning(num_classes=43)
-
-
-trainer = Trainer(
-    max_epochs=9, callbacks=[metrics], logger=WandbLogger(project="mlops_finalProject")
-)
-wandb.watch(model, log_freq=100)
-
-trainer.fit(model, trainloader, val_dataloaders=testloader)
-torch.save(model.state_dict(), 'models/trained_model_timm_lightning.pt')
-
-plt.plot(range(len(metrics.training_losses)), metrics.training_losses)
-# Add a title and axis labels
-plt.title("Training Loss vs Training Steps")
-plt.xlabel("Training Steps")
-plt.ylabel("Training Loss")
-plt.savefig("reports/figures/loss_64img.png")
-plt.close()
+    metrics = MetricTracker()
+    model = MobileNetV3Lightning(num_classes=43)
 
 
-plt.plot(range(len(metrics.validation_accuracies)), metrics.validation_accuracies)
-plt.title("validation accuracies vs Epochs Steps")
-plt.xlabel("Epoch")
-plt.ylabel("Validation accuracy")
-plt.savefig("reports/figures/val_acc_64img.png")
+    trainer = Trainer(
+        max_epochs=9, callbacks=[metrics], logger=WandbLogger(project="mlops_finalProject")
+    )
+    wandb.watch(model, log_freq=100)
 
-# Save the plot
-# save weights locally
-timestamp = datetime.today().strftime('%Y%m%d_%H%M')
-name = f"inference_model_32img_{timestamp}.pt"
+    trainer.fit(model, trainloader, val_dataloaders=testloader)
+    torch.save(model.state_dict(), 'models/trained_model_timm_lightning.pt')
 
-torch.save(model.state_dict(), 'models/' + name)
+    plt.plot(range(len(metrics.training_losses)), metrics.training_losses)
+    # Add a title and axis labels
+    plt.title("Training Loss vs Training Steps")
+    plt.xlabel("Training Steps")
+    plt.ylabel("Training Loss")
+    plt.savefig("reports/figures/loss_64img.png")
+    plt.close()
 
-script = model.to_torchscript()
-torch.jit.save(script, "models/model_for_inference.pt")
-script.save('models/model_for_inference2.pt')
 
-storage_client = storage.Client()
-bucket = storage_client.get_bucket("training-bucket-mlops") 
-blob = bucket.blob(name)
-blob.upload_from_filename('models/' + name)
-print(f"Succesfully push the weights {name} into: {bucket}")
+    plt.plot(range(len(metrics.validation_accuracies)), metrics.validation_accuracies)
+    plt.title("validation accuracies vs Epochs Steps")
+    plt.xlabel("Epoch")
+    plt.ylabel("Validation accuracy")
+    plt.savefig("reports/figures/val_acc_64img.png")
+
+    # Save the plot
+    # save weights locally
+    timestamp = datetime.today().strftime('%Y%m%d_%H%M')
+    name = f"inference_model_32img_{timestamp}.pt"
+
+    torch.save(model.state_dict(), 'models/' + name)
+
+    script = model.to_torchscript()
+    torch.jit.save(script, "models/model_for_inference.pt")
+    script.save('models/model_for_inference2.pt')
+
+    storage_client = storage.Client()
+    bucket = storage_client.get_bucket("training-bucket-mlops") 
+    blob = bucket.blob(name)
+    blob.upload_from_filename('models/' + name)
+    print(f"Succesfully push the weights {name} into: {bucket}")
+
+if __name__ == '__main__':
+    if check_gcp():
+        num_workers = 8
+        print("Training on cloud")
+    else:
+        num_workers = 0
+        print("Training on premises")
+    main(num_workers)
