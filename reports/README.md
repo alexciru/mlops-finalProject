@@ -59,7 +59,7 @@ Group 23
 > *s222913, sXXXXXX, sXXXXXX*
 >
 > Answer:
-
+Q to verify: 
 s222999, 
 
 ### Question 3
@@ -73,7 +73,7 @@ s222999,
 >
 > Answer:
 
---- question 3 fill here ---
+In our project, we used the TIMM framework which is built on top of the PyTorch framework. It provides a set of pre-trained models and tools for fine-tuning those models on specific tasks. Using the TIMM framework we were able to download the MobileNetV3 (small) model architecture and also a pre-trained version of this model. Although the chosen model was trained with 1000 output classes using another functionality we were able to add an additional layer to the model’s architecture to map the output to our 43 classes from the GTRSB dataset. Using finetuning functionality we were able to update weights on all layers during training to adapt the MobileNetV3 model to recognize images from the GTRSB dataset.
 
 ## Coding environment
 
