@@ -192,12 +192,7 @@ We used DVC initially with the integration with google drive but we quickly move
 >
 > Answer:
 
-TODO: add more
-We created diferent workflows to have CI in our project. Initially we created a test workflow to check if the code that was being pushed could pass the unit testing to protect the main branch. Also the isort workflow was added to sort the imports alphabetially and ensure consistency in the project.
-
-
-Pre-commit
-generate docker img ??
+We created different workflows to ensure CI in our project. Initially, we created a test workflow to check if the code that was being pushed could pass the unit testing to protect the main branch. Also, the isort workflow was added to sort the imports alphabetically and ensure consistency in the project, example of this action can be seen here: <https://github.com/alexciru/mlops-finalProject/blob/main/.github/workflows/isort.yml>. We also implemented a test that formatted our code so that it is up to the black formatting patter standard. Bofre code is to be merged with the main branch it is also tested by unitests.
 
 
 ## Running code and tracking experiments
