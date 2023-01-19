@@ -59,7 +59,7 @@ Group 23
 > sXXXXXX, sXXXXXX*
 >
 > Answer:
-Q to verify: 23, 12, 15     
+
 s222999, s210450, s213162, s222913, s182105
 
 ### Question 3
