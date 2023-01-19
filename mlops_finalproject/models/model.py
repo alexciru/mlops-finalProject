@@ -11,12 +11,13 @@ import timm
 
 
 class MobileNetV3Lightning(pl.LightningModule):
-    def __init__(self, num_classes=43, pretained=False):
+    def __init__(self, learn_rate, num_classes=43, pretained=False):
         super(MobileNetV3Lightning, self).__init__()
         self.model = self.build_model()
         # self.optimizer = optim.Adam(self.model.parameters(), lr=0.01)#, weight_decay=0.1)
         self.criterion = nn.CrossEntropyLoss()
         self.accuracy = torchmetrics.Accuracy(task='multiclass', num_classes=num_classes)
+        self.learn_rate = learn_rate
 
     def forward(self, x: torch.Tensor):
         if x.ndim != 4:
@@ -31,7 +32,7 @@ class MobileNetV3Lightning(pl.LightningModule):
         return x
 
     def configure_optimizers(self):
-        optimizer = optim.Adam(self.model.parameters(), lr=0.01)
+        optimizer = optim.Adam(self.model.parameters(), lr=self.learn_rate)
         return optimizer
 
     def training_step(self, batch, batch_idx):
