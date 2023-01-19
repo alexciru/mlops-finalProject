@@ -26,7 +26,7 @@ jobs:
         pip install isort
 
 
-    - name: run isort on project
+    - name: run black on project
       run: |
         black mlops_finalproject/
     
