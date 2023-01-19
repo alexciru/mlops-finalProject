@@ -437,3 +437,5 @@ During the development of the project, we come across many bugs and problems. On
 >
 > Answer:
 
+Student s222914 was in charge of organizing the initial setup the working enviroment (Github, W&B, GCP, DVC ...), worked in the CI with github actions and workied on the deployment in the cloud of training and prediction. 
+Student s2182105 implemented the training and predict with py-lightning, deployed the torchserver locally and helped with the deploy of the prediction in the cloud.
