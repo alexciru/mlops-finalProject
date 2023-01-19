@@ -119,7 +119,8 @@ For the project, we used the cookiecutter data science project template. Where e
 >
 > Answer:
 
-We implemented pep8 guidelines in order to standardise the code style and flake and black libraries to check and adapt to these guidelines. It is important to use style guidelines, especially in big projects with different developers to accomplish consistency in the project making it easier to read and to understand different parts of the code.
+We implemented pep8 guidelines in order to standardise the code style and flake and black libraries to check and adapt to these guidelines. It is important to use style guidelines, especially in big projects with different developers to accomplish consistency in the project making it easier to read, understand and to maintain.
+
 ## Version control
 
 > In the following section we are interested in how version control was used in your project during development to
@@ -311,7 +312,7 @@ In our project, we use the buckets of GCP for multiple things: first, we store t
 >
 > Answer:
 
---- question 18 fill here ---
+ The main use of Computer engine was to use then as test enviroments to test the docker images before being deployed in the google services Vertex AI and Platform AI. We used n1-standard-1 that used Intel Haswell as CPU platforms. Some experiments where conducted in computer engines with GPUs without success.
 
 ### Question 19
 
@@ -403,7 +404,7 @@ At the beginning of the work, we created a shared project. For this project work
 > *Whenever we commit code and puch to github, it auto triggers ... and ... . From there the diagram shows ...*
 >
 > Answer:
-
+[Project pipeline overview.](figures/graph2.png)
 In the beginning, we started the project with cookiecutter to have a standardized folder structure. We tried to code as many useful "make" commands as possible to make our lifes easier. The heart of this group work is git and github as for probably all groups. It allows us to work on different branches and to experiment freely without causing any problems to the already existing code. We have created workflow files just like shown in the exercises, which create docker images of our whole setup including our notebooks, data etc. every time we push changes to github. We consider these functionalities the most important.
 
 Further, we used Hydra and the respective config.yaml for hyperparamter organization and WandB for logging our results. We do not use the built-in-functionality of WandB for hyperparameters as we found Hydra to be more appealing. We have tested data drifting with our training and test set, which obviously gave no errors, but when we would receive new data this would become handy in order to keep track of the datas properties. In the end, we checked our code quality with flake8 etc. to make sure that it is conform to the norm. Lastly, we deployed the model and tried to include as many features as possible inside the cloud. We also tried creating a google function, but due to dependency issues with could not realize this 2nd form of deployment. 
@@ -437,3 +438,6 @@ During the development of the project, we come across many bugs and problems. On
 >
 > Answer:
 
+Member s222999 contributed to the preprocessing of data so that they can be used to train the model, writing and validating the model_train.py and predict_model.py scripts, writing unittest, and profiling of the code.
+Student s222914 was in charge of organizing the initial setup the working enviroment (Github, W&B, GCP, DVC ...), worked in the CI with github actions and workied on the deployment in the cloud of training and prediction. 
+Student s2182105 implemented the training and predict with py-lightning, deployed the torchserver locally and helped with the deploy of the prediction in the cloud.
