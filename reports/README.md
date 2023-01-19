@@ -56,11 +56,11 @@ Group 23
 >
 > Example:
 >
-> *s222913, sXXXXXX, sXXXXXX*
+> sXXXXXX, sXXXXXX*
 >
 > Answer:
 Q to verify: 23, 12, 15     
-s222999, 
+s222999, s210450, s213162, s222913, s182105
 
 ### Question 3
 > **What framework did you choose to work with and did it help you complete the project?**
@@ -354,7 +354,7 @@ The debugging method varied depending on the group member. The most common debug
 >
 > Answer:
 
-We managed to deploy the model in the GCP cloud. However, first, we trained the model locally and afterwards saved it and loaded it for the predictions, that were run locally. Once this was completed we moved to set up the model in the cloud. The workflow of the model deployment in the cloud can be described as follows: whenever a team member successfully pushes and merges code with the main branch in the GitHub repository a docker file is automatically created in the GCP cloud. Then with the latest docker image, we are training the model in the cloud using Vertex AI. Once the training has finished the .pck file is created and we deploy this model in the cloud and use it for future projections. 
+We managed to deploy the model in the GCP cloud. However, first, we trained the model locally and afterward saved it and loaded it for the predictions, that were run locally. Once this was completed we moved to set up the model in the cloud. The workflow of the model deployment in the cloud can be described as follows: whenever a team member successfully pushes and merges code with the main branch in the GitHub repository a docker file is automatically created in the GCP cloud. Then with the latest docker image, we are training the model in the cloud using Vertex AI. Once the training has finished the weights.pt file is saved in the google cloud bucket.  Then the image of the PyTorch Server  is created and we deploy this model in the cloud and use it for future projections.  
 
 ### Question 23
 
@@ -369,7 +369,7 @@ We managed to deploy the model in the GCP cloud. However, first, we trained the 
 >
 > Answer:
 
-We managed to implement data driving check and it has been shown that all data from our dataset, at the current state, is not influenced by driving. It could be expected as we compared training data with the test data. We managed to set up a simple monitoring in the google cloud. We monitor the total space available for our project, this included the dataset and all necessary google bucket files.
+We managed to implement data drifting check and it has been shown that all data from our dataset, at the current state, is not influenced by driving. It could be expected as we compared training data with the test data. We managed to set up a simple monitoring in the google cloud. We monitor the total space available for our project, this included the dataset and all necessary google bucket files.
 
 ### Question 24
 
@@ -383,7 +383,7 @@ We managed to implement data driving check and it has been shown that all data f
 >
 > Answer:
 
---- question 24 fill here ---
+At the beginning of the work, we created a shared project. For this project work, we used 25 credits and it turned the provided cost breakdown does not provide any details. during personal exercises, s222999 used 13 credits, s222913 25 credits, s210450 24 credits, s213162 10 credits, s182105 used 45 credits.
 
 ## Overall discussion of project
 
