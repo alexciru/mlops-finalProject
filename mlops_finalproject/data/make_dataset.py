@@ -12,23 +12,25 @@ from torch.utils.data import Subset, DataLoader, Dataset
 from tqdm import tqdm
 from PIL import Image
 
+
 class the_dataset(Dataset):
     def __init__(self, train, trans, input_filepath):
         self.input_filepath = input_filepath
         if train:
-            self.test_df = pd.read_csv(input_filepath+"/Train.csv")[["ClassId","Path"]]
+            self.test_df = pd.read_csv(input_filepath + "/Train.csv")[["ClassId", "Path"]]
         else:
-            self.test_df = pd.read_csv(input_filepath+"/Test.csv")[["ClassId","Path"]]
+            self.test_df = pd.read_csv(input_filepath + "/Test.csv")[["ClassId", "Path"]]
         self.trans = trans
 
     def __len__(self):
         return len(self.test_df)
 
     def __getitem__(self, idx):
-        label = self.test_df.iloc[idx,0]
-        image = Image.open(self.input_filepath + "/" + self.test_df.iloc[idx,1])
+        label = self.test_df.iloc[idx, 0]
+        image = Image.open(self.input_filepath + "/" + self.test_df.iloc[idx, 1])
         image = self.trans(image)
         return image, label
+
 
 @click.command()
 @click.argument("input_filepath", type=click.Path(exists=True))
@@ -71,7 +73,7 @@ def main(input_filepath: str, output_filepath: str, num_images: int):
         os.mkdir(f"{output_filepath}train/")
     torch.save(train_images, f"{output_filepath}train/images.pt")
     torch.save(train_labels, f"{output_filepath}train/labels.pt")
-    logger.info("train data stored successfully") 
+    logger.info("train data stored successfully")
 
     ############ Import test set #################
     test_dataset = the_dataset(False, transform, input_filepath)
