@@ -2,7 +2,8 @@ Project Description
 ==============================
 
 
-
+## Overview
+[Project pipeline.](reports/figures/graph2.png)
 
 ## Overall goal of the project  
 
