@@ -1,6 +1,6 @@
 FROM pytorch/torchserve:0.3.0-cpu
 
-COPY mlops_finalproject/models/model.py inference_model_32img_20230118_2315.pt mlops_finalproject/models/mnet_handler.py /home/model-server/
+COPY mlops_finalproject/models/model.py inference_model_32img_20230118_2315.pt mlops_finalproject/inference/mnet_handler.py /home/model-server/
 COPY requirements.txt requirements.txt
 COPY setup.py setup.py
 

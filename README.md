@@ -55,7 +55,7 @@ Execute with
 
 2. Execute docker
 
-` docker run -p 8080:8080 --name=local_mnet_inference99 europe-west1-docker.pkg.dev/mlops-finalproject/inference-mnet/serve-mnist`
+` docker run -p 8080:8080 --name=local_mnet_inference99 europe-west1-docker.pkg.dev/mlops-finalproject/inference-mnet/serve-mnet`
 
 3. Send to get prediction (copy that to terminal)
 
@@ -65,7 +65,7 @@ cat > instances.json <<END
   "instances": [
     {
       "data": {
-        "b64": "b64": "$(base64 --wrap=0 data/raw/German/Test/00000.png)"
+        "b64": "$(base64 --wrap=0 data/raw/German/Test/00000.png)"
       }
     }
   ]
@@ -75,7 +75,7 @@ END
 curl -X POST \
   -H "Content-Type: application/json; charset=utf-8" \
   -d @instances.json \
-  localhost:8080/predictions/mnist
+  localhost:8080/predictions/mnet
 ```
 
 ### Predict

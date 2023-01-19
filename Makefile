@@ -60,15 +60,22 @@ data: requirements
 	$(PYTHON_INTERPRETER) mlops_finalproject/data/make_dataset.py  data/raw/German/  data/processed/
 
 
-
+# locally
 train: 
 	$(PYTHON_INTERPRETER) mlops_finalproject/models/train_model.py
 
+predict:
+    $(PYTHON_INTERPRETER) python mlops_finalproject/models/predict_model.py trained_model_32img_20230118_1729.pt data\raw\German\Test
+
+#cloud - run training
 train_cloud_cpu: 
 	gcloud ai custom-jobs create --region=europe-west1 --display-name=test-run --config=config_cpu.yaml
 
 train_cloud_gpu: 
 	gcloud ai custom-jobs create --region=europe-west1 --display-name=test-run --config=config_gpu.yaml
+
+# deploy pytorch server locally
+
 
 #################################################################################
 # Self Documenting Commands                                                     #

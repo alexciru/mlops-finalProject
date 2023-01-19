@@ -59,11 +59,12 @@ class MetricTracker(Callback):
 # )
 
 
+
 train_dataset = MyDataset(True, "data/processed")
-trainloader = DataLoader(train_dataset, batch_size=128, shuffle=True, num_workers=8)
+trainloader = DataLoader(train_dataset, batch_size=128, shuffle=True, num_workers=1)
 
 test_dataset = MyDataset(False, "data/processed")
-testloader = DataLoader(test_dataset, batch_size=128, shuffle=False, num_workers=8)
+testloader = DataLoader(test_dataset, batch_size=128, shuffle=False, num_workers=1)
 
 metrics = MetricTracker()
 model = MobileNetV3Lightning(num_classes=43)
