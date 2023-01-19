@@ -62,5 +62,8 @@ def test_load_data_labels():
 
 @pytest.mark.skipif(not os.path.exists("data/raw/German/Test.csv"), reason="Data files not found")
 def test_load_test_data():
-    test_images, test_labels = mlops_finalproject.models.predict_model.get_data("data/raw/German")
+    
+    test_images = torch.load("data/processed/test/images.pt")
+    test_labels = torch.load("data/processed/test/labels.pt")
+
     assert len(test_images) == len(test_labels) == 12630 , "Test size have an incorrect number of entries"

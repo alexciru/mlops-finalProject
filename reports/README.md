@@ -59,7 +59,7 @@ Group 23
 > *s222913, sXXXXXX, sXXXXXX*
 >
 > Answer:
-Q to verify: 
+Q to verify: 23
 s222999, 
 
 ### Question 3
@@ -109,8 +109,6 @@ During the development of our project, we were using Anaconda to manage our virt
 
 For the project, we used the cookiecutter data science project template. Where each of the folders had a specific purpose. The `data` folder is where the data is stored with different subfolders for the original data, the intermediated folder and the final data used for the model. Here we added a new folder to store the raw data from our dataset. The `doc` folder is where the documentation is stored. The `model` folder is where all the info related to the model such as checkpoints and predictions. `Notebooks` is used to store the Jupiters that were used during development, ` references` is used to store manuals, `reports` is where the Html and reports are generated, `src` is where all the source files are. These are divided into subfolders depending on the purpose of the files. We also added the tests folder where we store unit tests scripts
 
-TODO: 
-We did not used all the folders and deleted XXX and XXX directories.
 
 ### Question 6
 
@@ -148,8 +146,7 @@ In our project, we have 2 tests to check if the model has been created correctly
 >
 > Answer:
 
-TODO: total coverage
-The total code coverage is X%. Despite being close to 100% does not mean that the code is error-free. The coverage only determines the % of the lines of code that are being executed in the test. But this does not cover different inputs in functions or edge cases making the test a nice way to test part of the code. 
+The total code coverage is 65%. Despite covering more than 50% of the code it does not mean that the code is error-free. The coverage only determines the % of the lines of code that are being executed in the test. But this does not cover different inputs in functions or edge cases making the test an efficient way to test only some parts of the code. To improve the coverage for our project we should implement testing the training code and also the code responsible for making the predictions. 
 
 ### Question 9
 
@@ -179,7 +176,7 @@ In our project we used both branches and pull requests for software version cont
 >
 > Answer:
 
-We used DVC initially with the integration with google drive but we quickly moved on to DVC integrated with bucket storage. During the project development, DVC enabled all members to get the original dataset using the terminal and DVC pull command without the struggle of extracting a huge file with 50000 images into the correct subdirectories inside the project. Later on, using DVC was very useful to ensure that all members were using data preprocessed in the same way. Using DVC also enables the storage of datasets that were preprocessed differently. With different datasets stored using DVC it was easier to test the model on different data.
+We used DVC initially with the integration with google drive but we quickly moved to use DVC integrated with bucket storage in the cloud. During the project development, DVC enabled all members to get the original dataset using the terminal and DVC pull command without the struggle of extracting a huge file with 50000 images into the correct subdirectories inside the project. Later on, using DVC was very useful to ensure that all members were using data preprocessed in the same way. Using DVC also enables the storage of datasets that were preprocessed differently. With different datasets stored using DVC, it was easier to test the model on different data.
 
 ### Question 11
 
@@ -421,7 +418,7 @@ We managed to deploy the model in the GCP cloud. However, first, we trained the 
 >
 > Answer:
 
---- question 26 fill here ---
+During the development of the project, we come across many bugs and problems. One of the biggest issues was using the chosen model (MobileNetV3) for the recognition of our dataset. Our dataset GTRSB is not included in the PyTorch framework so it is not possible to download it just using the data loader. Once we downloaded this dataset from a different source we had to create our own script that loaded and created training files in the correct shape and format. Because of that, we had to adjust the model’s structure, training and prediction process. It took us a long time to identify mistakes we had made in the data preparation process and later a mistake with updating the weights of the pre-trained model. 
 
 ### Question 27
 
