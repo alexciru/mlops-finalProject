@@ -11,7 +11,7 @@ import os
 from tqdm import tqdm
 
 #Hyperparameters
-num_epochs = 4
+num_epochs = 10
 learning_rate = 0.001        
 
 wandb.init(
