@@ -296,7 +296,7 @@ The debugging method varied depending on the group member. The most common debug
 >
 > Answer:
 
---- question 17 fill here ---
+In our project, we use the buckets of GCP for multiple things: first, we store training and test data for tests. In addition, we save the model weights of the trained models in an own bucket to reload it for later use. We did not use engine too much, since we deployed the model with Vertex AI and tried to deploy the model with Google functions and it was, therefore, not necessary.
 
 ### Question 18
 
@@ -404,7 +404,9 @@ At the beginning of the work, we created a shared project. For this project work
 >
 > Answer:
 
---- question 25 fill here ---
+In the beginning, we started the project with cookiecutter to have a standardized folder structure. We tried to code as many useful "make" commands as possible to make our lifes easier. The heart of this group work is git and github as for probably all groups. It allows us to work on different branches and to experiment freely without causing any problems to the already existing code. We have created workflow files just like shown in the exercises, which create docker images of our whole setup including our notebooks, data etc. every time we push changes to github. We consider these functionalities the most important.
+
+Further, we used Hydra and the respective config.yaml for hyperparamter organization and WandB for logging our results. We do not use the built-in-functionality of WandB for hyperparameters as we found Hydra to be more appealing. We have tested data drifting with our training and test set, which obviously gave no errors, but when we would receive new data this would become handy in order to keep track of the datas properties. In the end, we checked our code quality with flake8 etc. to make sure that it is conform to the norm. Lastly, we deployed the model and tried to include as many features as possible inside the cloud. We also tried creating a google function, but due to dependency issues with could not realize this 2nd form of deployment. 
 
 ### Question 26
 
