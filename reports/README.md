@@ -312,7 +312,7 @@ In our project, we use the buckets of GCP for multiple things: first, we store t
 >
 > Answer:
 
---- question 18 fill here ---
+ The main use of Computer engine was to use then as test enviroments to test the docker images before being deployed in the google services Vertex AI and Platform AI. We used n1-standard-1 that used Intel Haswell as CPU platforms. Some experiments where conducted in computer engines with GPUs without success.
 
 ### Question 19
 
