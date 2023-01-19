@@ -12,114 +12,114 @@ from tqdm import tqdm
 from google.cloud import storage
 import os
 from datetime import datetime
-
-
-#Hyperparameters
-num_epochs = 10
-learning_rate = 0.001        
-
-wandb.init(
-    # set the wandb project where this run will be logged
-    project="mlops_finalProject",
-    
-    # track hyperparameters and run metadata
-    config={
-    "learning_rate": learning_rate,
-    "architecture": "CNN",
-    "dataset": "GTSRB",
-    "epochs": num_epochs,
-    }
-)
-
+import hydra
 
 class MyDataset(Dataset):
-    def __init__(self, train, path):
+        def __init__(self, train, path):
 
-        if train:
-            self.images_path = os.path.join(path, "train", "images.pt")
-            self.labels_path = os.path.join(path, "train", "labels.pt")
+            if train:
+                self.images_path = os.path.join(path,"data","processed","train","images.pt")
+                self.labels_path = os.path.join(path,"data","processed","train","labels.pt")
 
-        else:
-            self.images_path = os.path.join(path, "test", "images.pt")
-            self.labels_path = os.path.join(path, "test", "labels.pt")
+            else:
+                self.images_path = os.path.join(path,"data","processed","test","images.pt")
+                self.labels_path = os.path.join(path,"data","processed","test","labels.pt")
 
-        self.images = torch.load(self.images_path)
-        self.labels = torch.load(self.labels_path)
-        self.labels = self.labels.type(torch.LongTensor)
+            self.images = torch.load(self.images_path)
+            self.labels = torch.load(self.labels_path)
+            self.labels = self.labels.type(torch.LongTensor)
+            
+        def __len__(self):
+            return len(self.images)
         
-    def __len__(self):
-        return len(self.images)
-    
-    def __getitem__(self, idx):
-        return self.images[idx], self.labels[idx]
+        def __getitem__(self, idx):
+            return self.images[idx], self.labels[idx]
 
-# my own version of dataset loading
-train_dataset = MyDataset(True, 'data/processed')
-print(len(train_dataset))
-trainloader = DataLoader(train_dataset, batch_size=128, shuffle=True)
+@hydra.main(config_path=os.path.join(os.getcwd(),'models/'), config_name='config.yaml')
+def main(cfg): 
 
-# test loader
-test_dataset = MyDataset(False, 'data/processed')
-print(len(test_dataset))
-testloader = DataLoader(test_dataset, batch_size=128, shuffle=False)
+    root_dir = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-#Creating a instance of the model
-model = MobileNetV3Lightning(num_classes=43)
+    wandb.init(
+        # set the wandb project where this run will be logged
+        project="mlops_finalProject",
+        name=hydra.utils.get_original_cwd(),
+        # track hyperparameters and run metadata
+        config={
+        "learning_rate": cfg.hyperparameters.learning_rate,
+        "architecture": "CNN",
+        "dataset": "GTSRB",
+        "epochs": cfg.hyperparameters.num_epochs,
+        }
+    )
 
-#init the wandb logging
-wandb.watch(model, log_freq=100)
+    # my own version of dataset loading
+    train_dataset = MyDataset(True, root_dir)
+    print(len(train_dataset))
+    trainloader = DataLoader(train_dataset, batch_size=cfg.hyperparameters.batch_size, shuffle=True)
 
-# Train the model
-losses = []
-steps = 0
-accu = 0
-for epoch in range(num_epochs):
-    print(f"epoch: {epoch+1}/{num_epochs}")
-    running_loss = 0
-    for (inputs, labels) in tqdm(trainloader):
-        loss_, preds_ = model.training_step(inputs, labels)
-        running_loss += loss_.item()
+    # test loader
+    test_dataset = MyDataset(False, root_dir)
+    print(len(test_dataset))
+    testloader = DataLoader(test_dataset, batch_size=cfg.hyperparameters.batch_size, shuffle=False)
 
-    # Optional: Decrease lr
-    # model.optimizer.param_groups[0]['lr'] *= 60
+    #Creating a instance of the model
+    model = MobileNetV3Lightning(cfg.hyperparameters.learning_rate, num_classes=43)
 
-    wandb.log({"Train loss": running_loss/len(trainloader)})
-    losses.append(running_loss/len(trainloader))
-    steps += 1
-    print(f"Training loss: {running_loss/len(trainloader)}")   
-    # # Print the accuracy
-    train_acc = model.test_model(trainloader)
-    test_acc = model.test_model(testloader)
-    wandb.log({"Train Acc": train_acc})
-    wandb.log({"Test Acc": test_acc})
-    print('Accuracy of the model on the train images: {} %'.format(train_acc))
-    print('Accuracy of the model on the test images: {} %'.format(test_acc))
-    if accu < test_acc:
-        accu = test_acc
-        torch.save(model.state_dict(), 'models/trained_model_64img.pt')
+    #init the wandb logging
+    wandb.watch(model, log_freq=100)
 
-# Use the plot function to draw a line plot
-plt.plot(range(steps), losses)
+    # Train the model
+    losses = []
+    steps = 0
+    accu = 0
+    for epoch in range(cfg.hyperparameters.num_epochs):
+        print(f"epoch: {epoch+1}/{cfg.hyperparameters.num_epochs}")
+        running_loss = 0
+        for (inputs, labels) in tqdm(trainloader):
+            loss_, preds_ = model.training_step(inputs, labels)
+            running_loss += loss_.item()
 
-# Add a title and axis labels
-plt.title("Training Loss vs Training Steps")
-plt.xlabel("Training Steps")
-plt.ylabel("Training Loss")
+        # Optional: Decrease lr
+        #model.optimizer.param_groups[0]['lr'] *= 60
 
-# Save the plot
-plt.savefig("reports/figures/loss_32img.png")
+        wandb.log({"Train loss": running_loss/len(trainloader)})
+        losses.append(running_loss/len(trainloader))
+        steps += 1
+        print(f"Training loss: {running_loss/len(trainloader)}")   
+        # # Print the accuracy
+        train_acc = model.test_model(trainloader)
+        test_acc = model.test_model(testloader)
+        wandb.log({"Train Acc": train_acc})
+        wandb.log({"Test Acc": test_acc})
+        print('Accuracy of the model on the train images: {} %'.format(train_acc))
+        print('Accuracy of the model on the test images: {} %'.format(test_acc))
+        if accu < test_acc:
+            accu = test_acc
 
-# save weights locally
-timestamp = datetime.today().strftime('%Y%m%d_%H%M')
-name = f"trained_model_32img_{timestamp}.pt"
+            # save weights locally
+            timestamp = datetime.today().strftime('%Y%m%d_%H%M')
+            name = f"trained_model_32img_{timestamp}.pt"
+            torch.save(model.state_dict(), os.path.join(root_dir,"models",name))
 
-torch.save(model.state_dict(), 'models/' + name)
+            # Save to google storage
+            # storage_client = storage.Client()
+            # buckets = list(storage_client.list_buckets())
+            # bucket = storage_client.get_bucket("training-bucket-mlops") 
+            # blob = bucket.blob("weights/" + name)
+            # blob.upload_from_filename('models/' + name )
+            # print(f"Succesfully push the weights {name} into: {bucket}")
 
+    # Use the plot function to draw a line plot
+    plt.plot(range(steps), losses)
 
-# Save to google storage
-storage_client = storage.Client()
-buckets = list(storage_client.list_buckets())
-bucket = storage_client.get_bucket("training-bucket-mlops") 
-blob = bucket.blob("weights/" + name)
-blob.upload_from_filename('models/' + name )
-print(f"Succesfully push the weights {name} into: {bucket}")
+    # Add a title and axis labels
+    plt.title("Training Loss vs Training Steps")
+    plt.xlabel("Training Steps")
+    plt.ylabel("Training Loss")
+
+    # Save the plot
+    plt.savefig("reports/figures/loss_32img.png")
+
+if __name__ == "__main__":
+    main()

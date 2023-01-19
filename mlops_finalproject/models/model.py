@@ -34,10 +34,10 @@ def build_model(pretrained=True, fine_tune=True, num_classes=43):
 
 
 class MobileNetV3Lightning(pl.LightningModule):
-    def __init__(self, num_classes=43, pretained=False):
+    def __init__(self, learn_rate, num_classes=43, pretained=False):
         super(MobileNetV3Lightning, self).__init__()
         self.model = build_model()
-        self.optimizer = optim.Adam(self.model.parameters(), lr=0.01)#, weight_decay=0.1)
+        self.optimizer = optim.Adam(self.model.parameters(), lr=learn_rate)# weight_decay=0.1)
         self.criterion = nn.CrossEntropyLoss()
 
     def forward(self, x: torch.Tensor):
