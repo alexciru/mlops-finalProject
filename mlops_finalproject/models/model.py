@@ -14,7 +14,6 @@ class MobileNetV3Lightning(pl.LightningModule):
     def __init__(self, learn_rate, num_classes=43, pretained=False):
         super(MobileNetV3Lightning, self).__init__()
         self.model = self.build_model()
-        # self.optimizer = optim.Adam(self.model.parameters(), lr=0.01)#, weight_decay=0.1)
         self.criterion = nn.CrossEntropyLoss()
         self.accuracy = torchmetrics.Accuracy(task='multiclass', num_classes=num_classes)
         self.learn_rate = learn_rate
@@ -36,18 +35,10 @@ class MobileNetV3Lightning(pl.LightningModule):
         return optimizer
 
     def training_step(self, batch, batch_idx):
-        # self.model.train()
-
-        # self.optimizer.zero_grad()
         inputs, labels = batch
-        # breakpoint()
-
         output = self.model(inputs)
         loss = self.criterion(output, labels)
-        # loss.backward()
-        # self.optimizer.step()
         preds = torch.argmax(F.log_softmax(output, dim=1), 1)
-        # train_running_correct += (preds == labels).sum().item()
         self.log('train_loss', loss)
 
         return loss
@@ -55,16 +46,10 @@ class MobileNetV3Lightning(pl.LightningModule):
     def validation_step(self, batch, batch_idx):
         inputs, labels = batch
         outputs = self.model(inputs)
-
         outputs = F.log_softmax(outputs, dim=1)
         predicted = torch.argmax(outputs.data, 1)
-
         acc = self.accuracy(outputs, labels)
-        # self.log('val_accuracy', acc, on_step=True, on_epoch=True)
-
-        # return predicted, labels
         return acc
-        # correct += predicted.eq(labels.data).cpu().sum()
 
 
     def validation_epoch_end(self, validation_step_outputs):

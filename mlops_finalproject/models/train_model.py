@@ -117,16 +117,16 @@ def main(cfg):
     timestamp = datetime.today().strftime('%Y%m%d_%H%M')
     name = f"inference_model_32img_{timestamp}.pt"
 
-    torch.save(model.state_dict(), 'models/' + name)
+    torch.save(model.state_dict(), os.path.join(root_dir,'models/',name))
 
     script = model.to_torchscript()
-    torch.jit.save(script, "models/model_for_inference.pt")
-    script.save('models/model_for_inference2.pt')
+    torch.jit.save(script, os.path.join(root_dir,"models/model_for_inference.pt"))
+    script.save(os.path.join('models/model_for_inference2.pt'))
 
     storage_client = storage.Client()
     bucket = storage_client.get_bucket("training-bucket-mlops") 
     blob = bucket.blob(name)
-    blob.upload_from_filename('models/' + name)
+    blob.upload_from_filename(os.path.join(root_dir,'models/', name))
     print(f"Succesfully push the weights {name} into: {bucket}")
 
 if __name__ == '__main__':
