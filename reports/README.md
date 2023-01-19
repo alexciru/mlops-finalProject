@@ -59,8 +59,8 @@ Group 23
 > *s222913, sXXXXXX, sXXXXXX*
 >
 > Answer:
-
---- question 2 fill here ---
+Q to verify: 23, 12, 15     
+s222999, 
 
 ### Question 3
 > **What framework did you choose to work with and did it help you complete the project?**
@@ -73,7 +73,7 @@ Group 23
 >
 > Answer:
 
---- question 3 fill here ---
+In our project, we used the TIMM framework which is built on top of the PyTorch framework. It provides a set of pre-trained models and tools for fine-tuning those models on specific tasks. Using the TIMM framework we were able to download the MobileNetV3 (small) model architecture and also a pre-trained version of this model. Although the chosen model was trained with 1000 output classes using another functionality we were able to add an additional layer to the model’s architecture to map the output to our 43 classes from the GTRSB dataset. Using finetuning functionality we were able to update weights on all layers during training to adapt the MobileNetV3 model to recognize images from the GTRSB dataset.
 
 ## Coding environment
 
@@ -92,7 +92,7 @@ Group 23
 >
 > Answer:
 
---- question 4 fill here ---
+During the development of our project, we were using Anaconda to manage our virtual environments. A new member of the team would need to create an environment with the same libraries to be able to work with our project. To create a .txt file with the necessary requirements one needs to run “conda create --name <env> --file requirements.txt”. It is also possible to create a .txt file with pip using the “pip freeze > requirements.txt” command. A new member to join our project would need to be added to the Google Cloud, git repository, and wandb project using his email by one of the members.
 
 ### Question 5
 
@@ -107,11 +107,8 @@ Group 23
 > *experiments.*
 > Answer:
 
-For the project we used the cookiecutter data science project template. Where each of the folders had a specifict porpuse. 
-The `data` folder is where the data is stored with different subfolders for the original data, the intermediated folder and for the final data used for the model. The `doc` folder is where the documentation is stored. The `model` folder is where all the info related to model such as checkpoints and predictions. `Notebooks` is used to store the jupyters that where used during development.`references` is used to stored manuals. `reports` is where the html and reports are generated.`src` is where all the source files are. These are divided into subfolders depending of the porpuse of the files.
+For the project, we used the cookiecutter data science project template. Where each of the folders had a specific purpose. The `data` folder is where the data is stored with different subfolders for the original data, the intermediated folder and the final data used for the model. Here we added a new folder to store the raw data from our dataset. The `doc` folder is where the documentation is stored. The `model` folder is where all the info related to the model such as checkpoints and predictions. `Notebooks` is used to store the Jupiters that were used during development, ` references` is used to store manuals, `reports` is where the Html and reports are generated, `src` is where all the source files are. These are divided into subfolders depending on the purpose of the files. We also added the tests folder where we store unit tests scripts
 
-TODO: 
-We did not used all the folders and deleted XXX and XXX directories.
 
 ### Question 6
 
@@ -122,7 +119,7 @@ We did not used all the folders and deleted XXX and XXX directories.
 >
 > Answer:
 
-We implemented pep8 guidelines in order to standarize the code style and flake and black libraries to check and adapt to this guidelines.Is important to use style guidelines, specially in big projects whith different developers in order to accomplish consistency in the project making it easier to read and to understand differents parts of the code.
+We implemented pep8 guidelines in order to standardise the code style and flake and black libraries to check and adapt to these guidelines. It is important to use style guidelines, especially in big projects with different developers to accomplish consistency in the project making it easier to read and to understand different parts of the code.
 ## Version control
 
 > In the following section we are interested in how version control was used in your project during development to
@@ -134,8 +131,7 @@ We implemented pep8 guidelines in order to standarize the code style and flake a
 >
 > Answer:
 
-TODO: NUMBER OF EXACT TEST
-We implemented unit test in order to check the both how the data is used to createdd the dataset and the model implementation.
+In our project, we have 2 tests to check if the model has been created correctly and 4 test to verify the correctness of the dataset. We implemented unittests to check if the loaded data has the correct size and later if all of the images in the used dataset have the correct shape. Our tests are also checking if every image has been loaded with a label. We implemented also 2 tests for the model, we are checking if the model’s output has the correct shape.
 
 ### Question 8
 
@@ -150,8 +146,7 @@ We implemented unit test in order to check the both how the data is used to crea
 >
 > Answer:
 
-TODO: total coverage
-The total code coverage is X%. Despite being close to 100% does not mean that the code is error free. The coverage only determines the % of the lines of code that are being executed in the test. But this not covers diferenents inputs in functions or edge cases making the test a nice way to test part of the code but neede to implement diferent scenarios to test all kinds of possible errors.
+The total code coverage is 65%. Despite covering more than 50% of the code it does not mean that the code is error-free. The coverage only determines the % of the lines of code that are being executed in the test. But this does not cover different inputs in functions or edge cases making the test an efficient way to test only some parts of the code. To improve the coverage for our project we should implement testing the training code and also the code responsible for making the predictions. 
 
 ### Question 9
 
@@ -181,8 +176,7 @@ In our project we used both branches and pull requests for software version cont
 >
 > Answer:
 
-We used DVC initially with the integration with google drive but we quickcly move on into DVC integrated in a bucket storage.
-At the beginning of the project it helped us to haev the initially dataset and to shared diferent versions of the processed dataset that was being used in different experients (like images with diferent sizes). It was very usefull to ensure that every team member had the same data during the development of the project.
+We used DVC initially with the integration with google drive but we quickly moved to use DVC integrated with bucket storage in the cloud. During the project development, DVC enabled all members to get the original dataset using the terminal and DVC pull command without the struggle of extracting a huge file with 50000 images into the correct subdirectories inside the project. Later on, using DVC was very useful to ensure that all members were using data preprocessed in the same way. Using DVC also enables the storage of datasets that were preprocessed differently. With different datasets stored using DVC, it was easier to test the model on different data.
 
 ### Question 11
 
@@ -223,7 +217,7 @@ generate docker img ??
 >
 > Answer:
 
---- question 12 fill here ---
+In our project, we use configuration files and Hydra software. Changing values in the config.yaml changes the hyperparameters in the model’s training process. To run an experiment with different parameters one would have to change it in the config.yaml file, save it and then run the train_model.py. To re-run a previous experiment it is possible to track hyperparameters used during the training process in the hydra’s logs folder.
 
 ### Question 13
 
@@ -238,7 +232,7 @@ generate docker img ??
 >
 > Answer:
 
---- question 13 fill here ---
+To ensure the same configuration throughout the experiments we are using config files. In the config file, we store hyperparameters of the model such as the number of epochs that the model is trained on, batch size and learning rate. For this part, we are using Hydra software. Moreover, Hydra is connected to the W&B project so that the hyperparameters can be seen for each run and for each figure saved. Changing hyperparameter in the config.yaml file changes the hyperparameter used during the training process. To reproduce an experiment it is possible to check saved hyperparameters in the W&B runn or in thy hydra’s log folder.
 
 ### Question 14
 
@@ -270,7 +264,7 @@ generate docker img ??
 >
 > Answer:
 
---- question 15 fill here ---
+During the development of our project, we created a couple of docker images. We created trainer.dockerfile that creates the image after the training process, then saves the model’s weights and exports them to the google cloud container. Prediction.dockerfile loads the model’s weights from the google container and it is used to make the prediction based on the created image. Inference.dockerfile this image is based on the PyTorch server, the difference between it and the prediction image is that we are able to send 1 image to the inference docker image.
 
 ### Question 16
 
@@ -285,7 +279,7 @@ generate docker img ??
 >
 > Answer:
 
---- question 16 fill here ---
+The debugging method varied depending on the group member. The most common debugging solution was to use a built-in debugger from VisualStudio IDE and to put breakpoints in the code structure. This allowed for the variable inspection in the middle of the run. To inspect the run time for different functions we did profiling. However, at some point in the project development, we switched to using the PythonLightning. Using the PythonLightning provided minimalization of the boilerplate and made the process of logging and exporting important values much easier. At the end of code development, we run profiling and sorted the output can be found in the gtsrb_out.prof file. It turns out that the most cumulative time has been used to call torch functions, 110.8s torch.conv2d, 110.4 torch.run_backward.
 
 ## Working in the cloud
 
@@ -326,7 +320,7 @@ generate docker img ??
 >
 > Answer:
 
---- question 19 fill here ---
+[GCP bucket](figures/gcp_bucket.png)
 
 ### Question 20
 
@@ -335,7 +329,7 @@ generate docker img ??
 >
 > Answer:
 
---- question 20 fill here ---
+[GCP container registry](figures/gcp_container_registry.jpg)
 
 ### Question 21
 
@@ -344,7 +338,7 @@ generate docker img ??
 >
 > Answer:
 
---- question 21 fill here ---
+[GCP cloud build history](figures/gcp_build_history.jpg)
 
 ### Question 22
 
@@ -360,7 +354,7 @@ generate docker img ??
 >
 > Answer:
 
---- question 22 fill here ---
+We managed to deploy the model in the GCP cloud. However, first, we trained the model locally and afterwards saved it and loaded it for the predictions, that were run locally. Once this was completed we moved to set up the model in the cloud. The workflow of the model deployment in the cloud can be described as follows: whenever a team member successfully pushes and merges code with the main branch in the GitHub repository a docker file is automatically created in the GCP cloud. Then with the latest docker image, we are training the model in the cloud using Vertex AI. Once the training has finished the .pck file is created and we deploy this model in the cloud and use it for future projections. 
 
 ### Question 23
 
@@ -375,7 +369,7 @@ generate docker img ??
 >
 > Answer:
 
---- question 23 fill here ---
+We managed to implement data driving check and it has been shown that all data from our dataset, at the current state, is not influenced by driving. It could be expected as we compared training data with the test data. We managed to set up a simple monitoring in the google cloud. We monitor the total space available for our project, this included the dataset and all necessary google bucket files.
 
 ### Question 24
 
@@ -424,7 +418,7 @@ generate docker img ??
 >
 > Answer:
 
---- question 26 fill here ---
+During the development of the project, we come across many bugs and problems. One of the biggest issues was using the chosen model (MobileNetV3) for the recognition of our dataset. Our dataset GTRSB is not included in the PyTorch framework so it is not possible to download it just using the data loader. Once we downloaded this dataset from a different source we had to create our own script that loaded and created training files in the correct shape and format. Because of that, we had to adjust the model’s structure, training and prediction process. It took us a long time to identify mistakes we had made in the data preparation process and later a mistake with updating the weights of the pre-trained model. We faced a lot of issues during the deployment into the cloud phase of the project. We were verily quickly able to generate and deploy the model locally using PyTorch sever. However, we were struggling to send requests to it once it has been deployed. We had the same issue when using Google Cloud functions for model deployment into the cloud. While using Google cloud functions for model deployment we had issues with library dependencies which we managed to solve. However, we faced the issue that a function could not be deployed because of a memory shortage.  
 
 ### Question 27
 
