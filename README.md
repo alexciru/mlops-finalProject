@@ -114,7 +114,7 @@ cat > instances.json <<END
 END
 
 curl -X POST \
-  -H "Authorization: Bearer ya29.a0AX9GBdX0tMpwQ-5kQU3QwS-YIKKiIcPhdR1kmzibTofTR6WSolE_ZrmZ63S96oqD4X8Cq1DkOS6sEkEjbrjiTlE7isI6U44r-TxV--P5m1aI6yZpa_kvTkmTY1-TMPpA_gEJoqLjkgN7WGHELr53Rw01kKaGlo2wOWC76waCgYKAe0SAQASFQHUCsbCzsyp2hE7Hqz2dYHSJ79Cew0173" \
+  -H "Authorization: Bearer ya29.a0AX9GBdUPSz0RPD3vTO2b_eYw0ZlfqKDXstRbemESVIOheSVBS235jUvZ3OAsMlfRgiN_l2A6jVZ91MitHhRguI5HjuxV6roMjv7Q5HMKBgHPhpPv4Wu8ZUHvXArqHK4HIqlqkdbaWGzVKvupQSxcL9PIeEV9a9tNMu5iAgaCgYKAa0SAQASFQHUCsbCtUscA76ZEGTVleI_tEVLYQ0173" \
   -H "Content-Type: application/json; charset=utf-8" \
   -d @instances.json \
   https://europe-west1-ml.googleapis.com/v1/projects/mlops-finalproject/models/inference_mnet/versions/v2:predict
