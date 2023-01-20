@@ -244,7 +244,8 @@ To ensure the same configuration throughout the experiments we are using config 
 >
 > Answer:
 
---- question 14 fill here ---
+[W&B graphs](figures/loss_graphs.png)
+During the development of our project, we decided to use W&B software to log the values from our experiments. The graphs from one of the runs can be seen in the attached figure. The most important metrics that we are tracking are ‘loss’ and ‘test accuracy’. To verify if the model is learning on the training dataset the loss has to be decreasing throughout the epochs. Then to verify if the model is capable of the image classification task. The accuracy metric is the number of correctly labelled images against the number of images in the whole dataset.  We can see the accuracy on the validation dataset is around 80% which can be considered acceptable performance. In the loss figure, it can be seen that the loss was decreasing between the epochs. Using W&B turned out to be very beneficial when it comes to monitoring the performance of the model throughout the different experiments and also sharing the results with different group members. 
 
 ### Question 15
 
